@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import MarqueeBanner from './components/MarqueeBanner';
 import FAQItem from './components/FAQItem';
 import SectionDivider from './components/SectionDivider';
 import {
@@ -90,6 +91,13 @@ export default function HomePage() {
       </div>
 
 {/* ==================== HERO ==================== */}
+      <section className="relative pt-6 md:pt-10 pb-10 md:pb-5">
+        ...
+      </section>
+
+      <MarqueeBanner />
+
+      <SectionDivider variant="line-dot" />
 <section className="relative pt-6 md:pt-10 pb-16 md:pb-20">
   <div className="max-w-7xl mx-auto px-4 md:px-8">
     <div className="grid lg:grid-cols-2 gap-6 md:gap-10 items-stretch min-h-[600px] md:min-h-[680px]">
@@ -283,76 +291,45 @@ export default function HomePage() {
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-            {[
-              { id: 'pizza', name: 'Пицца', count: 2, color: '#f97316', bg: 'from-orange-50 to-orange-100' },
-              { id: 'sushi', name: 'Суши', count: 2, color: '#e11d48', bg: 'from-rose-50 to-rose-100' },
-              { id: 'burger', name: 'Бургеры', count: 2, color: '#dc2626', bg: 'from-red-50 to-red-100' },
-              { id: 'asian', name: 'Азиатская', count: 2, color: '#16a34a', bg: 'from-emerald-50 to-emerald-100' },
-              { id: 'georgian', name: 'Грузинская', count: 2, color: '#9333ea', bg: 'from-purple-50 to-purple-100' },
-              { id: 'coffee', name: 'Кофе и десерты', count: 2, color: '#92400e', bg: 'from-amber-50 to-amber-100' },
-            ].map((cat, i) => (
-              <motion.div
-                key={cat.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-              >
-                <Link
-                  href={`/restaurants?cuisine=${cat.id}`}
-                  className="group relative flex flex-col justify-between h-52 md:h-60 lg:h-64 p-5 md:p-6 rounded-3xl bg-food-surface border border-food-border hover:border-food-primary transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-food-primary/10 overflow-hidden"
-                >
-                  <div
-                    className="absolute top-3 right-3 w-12 h-12 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                      backgroundImage: `radial-gradient(circle, ${cat.color} 1px, transparent 1px)`,
-                      backgroundSize: '6px 6px',
-                    }}
-                  />
-                  <div
-                    className={`absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t ${cat.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                  />
-                  <div
-                    className="absolute top-0 left-0 right-0 h-[3px] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
-                    style={{ backgroundColor: cat.color }}
-                  />
-
-                  <div className="relative flex items-start justify-between">
-                    <span
-                      className="text-6xl md:text-7xl font-extrabold leading-none opacity-20 group-hover:opacity-40 transition-opacity"
-                      style={{ color: cat.color }}
-                    >
-                      0{i + 1}
-                    </span>
-                    <span
-                      className="w-2.5 h-2.5 rounded-full mt-2 flex-shrink-0 relative"
-                      style={{ backgroundColor: cat.color }}
-                    >
-                      <span
-                        className="absolute inset-0 rounded-full animate-ping opacity-40"
-                        style={{ backgroundColor: cat.color }}
-                      />
-                    </span>
-                  </div>
-
-                  <div className="relative">
-                    <div className="text-xs text-food-muted mb-2">
-                      {cat.count} ресторана
-                    </div>
-                    <h3 className="font-extrabold text-lg md:text-xl leading-tight mb-3 group-hover:text-food-primary transition-colors">
-                      {cat.name}
-                    </h3>
-                    <div
-                      className="inline-flex items-center gap-1 text-xs font-semibold opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300"
-                      style={{ color: cat.color }}
-                    >
-                      Смотреть
-                      <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+          {[
+  { id: 'pizza', name: 'Пицца', count: 2, image: '/images/categories/pizza.jpg' },
+  { id: 'sushi', name: 'Суши', count: 2, image: '/images/categories/sushi.jpg' },
+  { id: 'burger', name: 'Бургеры', count: 2, image: '/images/categories/burger.jpg' },
+  { id: 'asian', name: 'Азиатская', count: 2, image: '/images/categories/asian.jpg' },
+  { id: 'georgian', name: 'Грузинская', count: 2, image: '/images/categories/georgian.jpg' },
+  { id: 'coffee', name: 'Кофе и десерты', count: 2, image: '/images/categories/coffee.jpg' },
+].map((cat, i) => (
+  <motion.div key={cat.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}>
+    <Link
+      href={`/restaurants?cuisine=${cat.id}`}
+      className="group relative flex flex-col justify-end h-56 md:h-64 lg:h-72 rounded-3xl overflow-hidden bg-food-surface border border-food-border hover:border-food-primary transition-all"
+    >
+      <Image
+        src={cat.image}
+        alt={cat.name}
+        fill
+        sizes="(max-width: 768px) 50vw, 16vw"
+        className="object-cover group-hover:scale-110 transition-transform duration-700"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+      <div className="relative p-4 md:p-5">
+  <h3
+    className="font-extrabold text-base md:text-lg leading-tight mb-1"
+    style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.6)' }}
+  >
+    {cat.name}
+  </h3>
+  <div
+    className="flex items-center gap-1 text-xs transition-colors"
+    style={{ color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}
+  >
+    <span>Смотреть</span>
+    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+  </div>
+</div>
+    </Link>
+  </motion.div>
+))}
           </div>
         </div>
       </section>

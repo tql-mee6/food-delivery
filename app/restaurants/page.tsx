@@ -1,15 +1,26 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { restaurants, cuisineLabels } from '@/lib/restaurants';
 import RestaurantCard from '../components/RestaurantCard';
 import type { Cuisine } from '@/types';
 
 export default function RestaurantsPage() {
+  const searchParams = useSearchParams();
+  const cuisineFromUrl = searchParams.get('cuisine');
+
   const [search, setSearch] = useState('');
   const [activeCuisine, setActiveCuisine] = useState<'all' | Cuisine>('all');
   const [sortBy, setSortBy] = useState<'rating' | 'deliveryTime' | 'minOrder'>('rating');
+
+  // Читаем категорию из URL (?cuisine=sushi)
+  useEffect(() => {
+    if (cuisineFromUrl && cuisineFromUrl in cuisineLabels) {
+      setActiveCuisine(cuisineFromUrl as Cuisine);
+    }
+  }, [cuisineFromUrl]);
 
   const cuisines: Array<'all' | Cuisine> = [
     'all',
@@ -24,12 +35,10 @@ export default function RestaurantsPage() {
   const filtered = useMemo(() => {
     let result = [...restaurants];
 
-    // Фильтр по кухне
     if (activeCuisine !== 'all') {
       result = result.filter((r) => r.cuisine === activeCuisine);
     }
 
-    // Поиск
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       result = result.filter(
@@ -39,7 +48,6 @@ export default function RestaurantsPage() {
       );
     }
 
-    // Сортировка
     if (sortBy === 'rating') {
       result.sort((a, b) => b.rating - a.rating);
     } else if (sortBy === 'deliveryTime') {
@@ -56,10 +64,16 @@ export default function RestaurantsPage() {
       {/* Заголовок */}
       <div className="mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-          Рестораны
+          {activeCuisine === 'all' ? 'Рестораны' : cuisineLabels[activeCuisine]}
         </h1>
         <p className="text-food-muted">
-          {restaurants.length} заведений с доставкой по вашему адресу
+          {filtered.length}{' '}
+          {filtered.length === 1
+            ? 'заведение'
+            : filtered.length < 5
+            ? 'заведения'
+            : 'заведений'}{' '}
+          с доставкой по вашему адресу
         </p>
       </div>
 
@@ -109,7 +123,7 @@ export default function RestaurantsPage() {
 
       {/* Сетка ресторанов */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((r) => (
             <RestaurantCard key={r.id} restaurant={r} />
           ))}
@@ -118,17 +132,17 @@ export default function RestaurantsPage() {
         <div className="text-center py-20">
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-2xl font-bold mb-2">Ничего не найдено</h3>
-          <p className="text-food-muted">
-            Попробуйте изменить фильтры или поисковый запрос
+          <p className="text-food-muted mb-6">
+            В этой категории пока нет ресторанов
           </p>
           <button
             onClick={() => {
               setSearch('');
               setActiveCuisine('all');
             }}
-            className="mt-6 px-6 py-3 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-colors"
+            className="px-6 py-3 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-colors"
           >
-            Сбросить фильтры
+            Показать все рестораны
           </button>
         </div>
       )}
