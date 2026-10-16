@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { Suspense, useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { restaurants, cuisineLabels } from '@/lib/restaurants';
 import RestaurantCard from '../components/RestaurantCard';
 import type { Cuisine } from '@/types';
 
-export default function RestaurantsPage() {
+function RestaurantsContent() {
   const searchParams = useSearchParams();
   const cuisineFromUrl = searchParams.get('cuisine');
 
@@ -15,7 +15,6 @@ export default function RestaurantsPage() {
   const [activeCuisine, setActiveCuisine] = useState<'all' | Cuisine>('all');
   const [sortBy, setSortBy] = useState<'rating' | 'deliveryTime' | 'minOrder'>('rating');
 
-  // Читаем категорию из URL (?cuisine=sushi)
   useEffect(() => {
     if (cuisineFromUrl && cuisineFromUrl in cuisineLabels) {
       setActiveCuisine(cuisineFromUrl as Cuisine);
@@ -23,61 +22,39 @@ export default function RestaurantsPage() {
   }, [cuisineFromUrl]);
 
   const cuisines: Array<'all' | Cuisine> = [
-    'all',
-    'pizza',
-    'sushi',
-    'burger',
-    'asian',
-    'georgian',
-    'coffee',
+    'all', 'pizza', 'sushi', 'burger', 'asian', 'georgian', 'coffee',
   ];
 
   const filtered = useMemo(() => {
     let result = [...restaurants];
-
     if (activeCuisine !== 'all') {
       result = result.filter((r) => r.cuisine === activeCuisine);
     }
-
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       result = result.filter(
-        (r) =>
-          r.name.toLowerCase().includes(q) ||
-          r.description.toLowerCase().includes(q)
+        (r) => r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q)
       );
     }
-
-    if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === 'deliveryTime') {
-      result.sort((a, b) => a.deliveryTime - b.deliveryTime);
-    } else if (sortBy === 'minOrder') {
-      result.sort((a, b) => a.minOrder - b.minOrder);
-    }
-
+    if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);
+    else if (sortBy === 'deliveryTime') result.sort((a, b) => a.deliveryTime - b.deliveryTime);
+    else if (sortBy === 'minOrder') result.sort((a, b) => a.minOrder - b.minOrder);
     return result;
   }, [search, activeCuisine, sortBy]);
 
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-      {/* Заголовок */}
       <div className="mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
           {activeCuisine === 'all' ? 'Рестораны' : cuisineLabels[activeCuisine]}
         </h1>
         <p className="text-food-muted">
           {filtered.length}{' '}
-          {filtered.length === 1
-            ? 'заведение'
-            : filtered.length < 5
-            ? 'заведения'
-            : 'заведений'}{' '}
+          {filtered.length === 1 ? 'заведение' : filtered.length < 5 ? 'заведения' : 'заведений'}{' '}
           с доставкой по вашему адресу
         </p>
       </div>
 
-      {/* Поиск + сортировка */}
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-food-muted pointer-events-none" />
@@ -89,7 +66,6 @@ export default function RestaurantsPage() {
             className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-food-surface border border-food-border focus:border-food-primary focus:outline-none focus:ring-4 focus:ring-food-primary/10 transition-all"
           />
         </div>
-
         <div className="relative">
           <SlidersHorizontal className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-food-muted pointer-events-none" />
           <select
@@ -104,7 +80,6 @@ export default function RestaurantsPage() {
         </div>
       </div>
 
-      {/* Фильтр по кухне */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-8 no-scrollbar">
         {cuisines.map((c) => (
           <button
@@ -121,9 +96,8 @@ export default function RestaurantsPage() {
         ))}
       </div>
 
-      {/* Сетка ресторанов */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map((r) => (
             <RestaurantCard key={r.id} restaurant={r} />
           ))}
@@ -132,20 +106,26 @@ export default function RestaurantsPage() {
         <div className="text-center py-20">
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-2xl font-bold mb-2">Ничего не найдено</h3>
-          <p className="text-food-muted mb-6">
-            В этой категории пока нет ресторанов
-          </p>
+          <p className="text-food-muted">Попробуйте изменить фильтры или поисковый запрос</p>
           <button
             onClick={() => {
               setSearch('');
               setActiveCuisine('all');
             }}
-            className="px-6 py-3 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-colors"
+            className="mt-6 px-6 py-3 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-colors"
           >
-            Показать все рестораны
+            Сбросить фильтры
           </button>
         </div>
       )}
     </main>
+  );
+}
+
+export default function RestaurantsPage() {
+  return (
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 md:px-8 py-8">Загрузка...</div>}>
+      <RestaurantsContent />
+    </Suspense>
   );
 }
