@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Star, Clock, Bike } from 'lucide-react';
+import { Star, Clock, Bike, ArrowUpRight } from 'lucide-react';
 import type { Restaurant } from '@/types';
 
 export default function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
@@ -16,73 +16,61 @@ export default function RestaurantCard({ restaurant }: { restaurant: Restaurant 
     >
       <Link
         href={`/restaurants/${restaurant.id}`}
-        className="group block rounded-3xl overflow-hidden bg-food-surface border border-food-border hover:border-food-primary transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-food-primary/15"
+        className="group relative block h-[380px] rounded-xl overflow-hidden bg-food-surface ring-1 ring-white/5 hover:ring-food-primary/60 transition-all"
       >
-        {/* Фото */}
-        <div className="relative h-52 overflow-hidden bg-food-surface-2">
-          <Image
-            src={restaurant.image}
-            alt={restaurant.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <Image
+          src={restaurant.image}
+          alt={restaurant.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+          className="object-cover group-hover:scale-[1.06] transition-transform duration-[900ms] ease-out"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/0" />
 
-          {/* Рейтинг */}
-          <div className="absolute top-3 right-3 px-3 py-1.5 bg-white/95 backdrop-blur rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
-            <Star className="w-3.5 h-3.5 fill-food-primary text-food-primary" />
-            {restaurant.rating}
-            <span className="text-food-muted font-normal text-xs">
-              ({restaurant.reviewsCount})
-            </span>
-          </div>
-
-          {/* Бесплатная доставка */}
-          {restaurant.deliveryFee === 0 && restaurant.isOpen && (
-            <div className="absolute top-3 left-3 px-3 py-1.5 bg-food-success text-white rounded-full text-xs font-bold shadow-lg">
+        {/* Верхние бейджи */}
+        <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-2">
+          {restaurant.deliveryFee === 0 ? (
+            <span className="px-2.5 py-1 rounded bg-food-success text-[#0f0d0c] text-[11px] font-bold uppercase tracking-wider">
               Бесплатная доставка
-            </div>
+            </span>
+          ) : (
+            <span />
           )}
-
-          {/* Закрыт */}
-          {!restaurant.isOpen && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
-              <span className="px-4 py-2 bg-white text-food-text rounded-full text-sm font-bold">
-                Закрыт
-              </span>
-            </div>
-          )}
+          <span className="flex items-center gap-1 px-2.5 py-1 rounded bg-black/60 backdrop-blur text-sm font-bold text-white">
+            <Star className="w-3.5 h-3.5 fill-food-accent text-food-accent" />
+            {restaurant.rating}
+          </span>
         </div>
 
-        {/* Инфо */}
-        <div className="p-5">
-          <h3 className="font-extrabold text-lg mb-1 group-hover:text-food-primary transition-colors">
+        {!restaurant.isOpen && (
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+            <span className="px-4 py-2 border border-white/40 text-white rounded font-display uppercase tracking-widest text-sm">
+              Закрыт
+            </span>
+          </div>
+        )}
+
+        {/* Нижняя часть */}
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <h3 className="font-display text-2xl md:text-[26px] text-white leading-tight mb-1.5">
             {restaurant.name}
           </h3>
-          <p className="text-food-muted text-sm mb-4 line-clamp-2 min-h-[40px]">
-            {restaurant.description}
-          </p>
+          <p className="text-white/70 text-sm mb-1 line-clamp-2">{restaurant.description}</p>
+          <p className="text-white/45 text-xs mb-4">Мин. заказ {restaurant.minOrder} ₽</p>
 
-          <div className="flex items-center gap-4 pt-4 border-t border-food-border text-sm">
-            <div className="flex items-center gap-1.5 text-food-muted">
-              <Clock className="w-4 h-4 text-food-primary" />
-              <span>{restaurant.deliveryTime} мин</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-food-muted">
-              <Bike className="w-4 h-4 text-food-primary" />
-              <span>
-                {restaurant.deliveryFee === 0
-                  ? 'Бесплатно'
-                  : `${restaurant.deliveryFee} ₽`}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-4 text-[13px] text-white/85 whitespace-nowrap">
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-food-primary" />
+                {restaurant.deliveryTime} мин
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Bike className="w-4 h-4 text-food-primary" />
+                {restaurant.deliveryFee === 0 ? 'Бесплатно' : `${restaurant.deliveryFee} ₽`}
               </span>
             </div>
-          </div>
-
-          <div className="mt-2 text-xs text-food-muted">
-            Мин. заказ:{' '}
-            <span className="font-semibold text-food-text">
-              {restaurant.minOrder} ₽
+            <span className="w-10 h-10 rounded-full bg-food-primary flex items-center justify-center translate-y-1 opacity-90 group-hover:translate-y-0 group-hover:opacity-100 group-hover:rotate-45 transition-all">
+              <ArrowUpRight className="w-5 h-5 text-white" />
             </span>
           </div>
         </div>

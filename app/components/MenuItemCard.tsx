@@ -12,6 +12,7 @@ type Props = {
   restaurantName: string;
 };
 
+/* Карточка блюда: крупное фото, цена и кнопка «в корзину» на первом плане */
 export default function MenuItemCard({ item, restaurantName }: Props) {
   const addItem = useCart((s) => s.addItem);
   const [added, setAdded] = useState(false);
@@ -36,39 +37,36 @@ export default function MenuItemCard({ item, restaurantName }: Props) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4 }}
-      className="group flex gap-4 p-3 md:p-4 rounded-2xl bg-food-surface border border-food-border hover:border-food-primary transition-all hover:shadow-xl hover:shadow-food-primary/5"
+      className="group flex flex-col rounded-xl overflow-hidden bg-food-surface ring-1 ring-white/5 hover:ring-food-primary/50 transition-all"
     >
-      {/* Фото */}
-      <div className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 rounded-xl overflow-hidden bg-food-surface-2">
+      <div className="relative aspect-[4/3] overflow-hidden bg-food-surface-2">
         <Image
           src={item.image}
           alt={item.name}
           fill
-          sizes="(max-width: 768px) 100px, 128px"
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          className="object-cover group-hover:scale-[1.07] transition-transform duration-700"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-food-surface via-transparent to-transparent" />
+        <span className="absolute top-3 left-3 px-2 py-0.5 rounded bg-black/60 backdrop-blur text-[11px] text-white/85">
+          {item.weight}
+        </span>
       </div>
 
-      {/* Инфо */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        <h3 className="font-bold text-base md:text-lg mb-1 pr-2 line-clamp-2">
-          {item.name}
-        </h3>
-        <p className="text-food-muted text-sm line-clamp-2 mb-2 flex-1">
-          {item.description}
-        </p>
-        <div className="text-xs text-food-muted mb-3">{item.weight}</div>
+      <div className="flex-1 flex flex-col p-5 pt-3">
+        <h3 className="font-display text-xl leading-tight mb-1.5">{item.name}</h3>
+        <p className="text-food-muted text-sm line-clamp-2 mb-5 flex-1">{item.description}</p>
 
-        <div className="flex items-center justify-between gap-3 mt-auto">
-          <div className="font-extrabold text-lg md:text-xl">
-            {item.price} ₽
+        <div className="flex items-center justify-between gap-3">
+          <div className="font-display text-2xl">
+            {item.price} <span className="text-food-primary">₽</span>
           </div>
           <button
             onClick={handleAdd}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full font-semibold text-sm transition-all ${
+            className={`flex items-center gap-1.5 h-11 px-4 rounded-md font-semibold text-sm transition-all ${
               added
-                ? 'bg-food-success text-white'
-                : 'bg-food-primary text-white hover:bg-food-primary-hover hover:scale-105'
+                ? 'bg-food-success text-[#0f0d0c]'
+                : 'bg-food-primary text-white hover:bg-food-primary-hover active:scale-95'
             }`}
           >
             {added ? (

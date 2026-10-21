@@ -43,9 +43,10 @@ function RestaurantsContent() {
   }, [search, activeCuisine, sortBy]);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
+    <main className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-14">
+      <div className="mb-10">
+        <div className="eyebrow mb-4">Доставка из ресторанов</div>
+        <h1 className="text-5xl md:text-7xl leading-none mb-4">
           {activeCuisine === 'all' ? 'Рестораны' : cuisineLabels[activeCuisine]}
         </h1>
         <p className="text-food-muted">
@@ -63,7 +64,7 @@ function RestaurantsContent() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Найти ресторан или кухню..."
-            className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-food-surface border border-food-border focus:border-food-primary focus:outline-none focus:ring-4 focus:ring-food-primary/10 transition-all"
+            className="w-full pl-12 pr-4 py-3.5 rounded-md bg-food-surface border border-food-border focus:border-food-primary focus:outline-none focus:ring-4 focus:ring-food-primary/15 transition-all"
           />
         </div>
         <div className="relative">
@@ -71,7 +72,7 @@ function RestaurantsContent() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="pl-10 pr-8 py-3.5 rounded-2xl bg-food-surface border border-food-border focus:border-food-primary focus:outline-none appearance-none cursor-pointer font-medium w-full md:w-auto"
+            className="pl-10 pr-8 py-3.5 rounded-md bg-food-surface border border-food-border focus:border-food-primary focus:outline-none appearance-none cursor-pointer font-medium w-full md:w-auto"
           >
             <option value="rating">По рейтингу</option>
             <option value="deliveryTime">Быстрая доставка</option>
@@ -85,10 +86,10 @@ function RestaurantsContent() {
           <button
             key={c}
             onClick={() => setActiveCuisine(c)}
-            className={`px-5 py-2.5 rounded-full font-semibold text-sm whitespace-nowrap transition-all ${
+            className={`px-5 h-10 rounded-md font-display uppercase tracking-[0.12em] text-[13px] whitespace-nowrap transition-all ${
               activeCuisine === c
-                ? 'bg-food-primary text-white shadow-lg shadow-food-primary/30'
-                : 'bg-food-surface border border-food-border text-food-text hover:border-food-primary'
+                ? 'bg-food-primary text-white'
+                : 'border border-food-border text-food-text/85 hover:border-food-primary'
             }`}
           >
             {cuisineLabels[c]}
@@ -97,7 +98,7 @@ function RestaurantsContent() {
       </div>
 
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map((r) => (
             <RestaurantCard key={r.id} restaurant={r} />
           ))}
@@ -112,7 +113,7 @@ function RestaurantsContent() {
               setSearch('');
               setActiveCuisine('all');
             }}
-            className="mt-6 px-6 py-3 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-colors"
+            className="mt-6 px-6 py-3 rounded-md bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-colors"
           >
             Сбросить фильтры
           </button>

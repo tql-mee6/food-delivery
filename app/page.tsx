@@ -2,638 +2,464 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import {
+  ArrowRight, Star, Plus, Check, Copy, Clock, Wallet, MapPin,
+} from 'lucide-react';
 import MarqueeBanner from './components/MarqueeBanner';
 import FAQItem from './components/FAQItem';
-import SectionDivider from './components/SectionDivider';
-import {
-  ArrowRight, Clock, MapPin, Star, Search,
-  UtensilsCrossed, Sparkles, TrendingUp, Award
-} from 'lucide-react';
-import { restaurants, cuisineLabels } from '@/lib/restaurants';
 import RestaurantCard from './components/RestaurantCard';
+import DishTile from './components/DishTile';
+import { BrushWord, TornEdge, Embers, Leaf } from './components/Decor';
+import FallingSkewers from './components/FallingSkewers';
+import { restaurants } from '@/lib/restaurants';
+import { menuItems } from '@/lib/menu';
+import { useCart } from '@/lib/cartStore';
 
-const CUISINE_ICONS: Record<string, string> = {
-  pizza: '🍕',
-  sushi: '🍣',
-  burger: '🍔',
-  asian: '🥢',
-  georgian: '🥟',
-  coffee: '☕',
+const PAPER = '#f1eadf';
+const WOOD = '#1d1410';
+const COAL = '#0f0d0c';
+
+const HIT_IDS = [
+  'tb-shashlik', 'bh-double', 'pm-pepperoni', 'sz-philadelphia',
+  'tb-khachapuri', 'ws-wok-shrimp', 'kh-khinkali', 'cl-cheesecake',
+];
+
+const restaurantName = (id: string) => restaurants.find((r) => r.id === id)?.name ?? '';
+
+const fadeUp = {
+  initial: { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.25 },
+  transition: { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] as const },
 };
 
 export default function HomePage() {
-  const topRestaurants = restaurants.slice(0, 3);
-  const cuisines = ['pizza', 'sushi', 'burger', 'asian', 'georgian', 'coffee'];
+  const hits = HIT_IDS.map((id) => menuItems.find((m) => m.id === id)!).filter(Boolean);
+  const heroDish = menuItems.find((m) => m.id === 'tb-shashlik')!;
+  const topRestaurants = [...restaurants].sort((a, b) => b.rating - a.rating).slice(0, 3);
 
   return (
-    <main className="overflow-hidden relative">
-      {/* ==================== ЕДИНЫЙ ФОН ==================== */}
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div
-          className="absolute top-[-10%] left-[-10%] w-[700px] h-[700px] rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 65%)',
-            filter: 'blur(80px)',
-          }}
-        />
-        <div
-          className="absolute top-[30%] right-[-15%] w-[800px] h-[800px] rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(220, 38, 38, 0.1) 0%, transparent 65%)',
-            filter: 'blur(90px)',
-          }}
-        />
-        <div
-          className="absolute bottom-[-20%] left-[20%] w-[700px] h-[700px] rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 65%)',
-            filter: 'blur(100px)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(249, 115, 22, 0.06) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(249, 115, 22, 0.06) 1px, transparent 1px)
-            `,
-            backgroundSize: '64px 64px',
-            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)',
-          }}
-        />
-        <div
-          className="absolute top-[15%] left-[3%] w-40 h-40 opacity-40"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(249, 115, 22, 0.5) 1.5px, transparent 1.5px)',
-            backgroundSize: '16px 16px',
-            maskImage: 'radial-gradient(circle, black 40%, transparent 80%)',
-            WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 80%)',
-          }}
-        />
-        <div
-          className="absolute top-[55%] right-[3%] w-40 h-40 opacity-40"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(220, 38, 38, 0.5) 1.5px, transparent 1.5px)',
-            backgroundSize: '16px 16px',
-            maskImage: 'radial-gradient(circle, black 40%, transparent 80%)',
-            WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 80%)',
-          }}
-        />
-        <div className="absolute top-[20%] right-[8%] flex flex-col gap-3 opacity-30">
-          <div className="w-24 h-px bg-food-primary" />
-          <div className="w-16 h-px bg-food-primary" />
-          <div className="w-32 h-px bg-food-primary" />
-        </div>
-        <div className="absolute bottom-[15%] left-[10%] w-20 h-20 rounded-full border border-food-primary/20 opacity-60" />
-        <div className="absolute top-[10%] right-[12%] w-32 h-32 rounded-full border border-food-primary/20 opacity-60" />
-      </div>
+    <main className="overflow-hidden">
+      {/* ==================== HERO ==================== */}
+      <section className="relative texture-slate bg-food-bg">
+        {/* Свечение углей */}
+        <div className="absolute right-[-10%] top-[5%] w-[900px] h-[900px] ember-glow opacity-70 pointer-events-none" />
+        <Embers />
+        {/* Дальний слой шашлыка — за текстом и тарелкой */}
+        <FallingSkewers layer="back" />
 
-{/* ==================== HERO ==================== */}
-      <section className="relative pt-6 md:pt-10 pb-10 md:pb-5">
-        ...
+        {/* Огромное слово на фоне, как в меню ресторана */}
+        <div
+          aria-hidden
+          className="absolute left-[-2%] bottom-[6%] font-display uppercase text-[22vw] leading-none text-white/[0.025] select-none pointer-events-none whitespace-nowrap"
+        >
+          Гриль
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 md:px-8 pt-10 md:pt-16 pb-16 md:pb-24 grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-6 items-center min-h-[calc(100vh-72px)]">
+          {/* Текст */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="relative z-10 order-2 lg:order-1"
+          >
+            <div className="eyebrow mb-6">Доставка горячей еды</div>
+
+            <h1 className="text-[46px] sm:text-[60px] lg:text-[78px] leading-[1.02] mb-6">
+              Хочется чего-то
+              <br />
+              <BrushWord>горячего</BrushWord>?
+            </h1>
+
+            <p className="text-food-muted text-lg md:text-xl leading-relaxed mb-9 max-w-[30rem]">
+              Шашлык с углей, пицца из дровяной печи и вок с огня —
+              из 12 ресторанов. Привезём за&nbsp;35&nbsp;минут, пока не остыло.
+            </p>
+
+            <div className="flex flex-wrap gap-3 mb-10">
+              <Link
+                href="/restaurants"
+                className="group inline-flex items-center gap-2.5 h-14 px-8 rounded-md bg-food-primary text-white font-bold uppercase tracking-wider text-sm hover:bg-food-primary-hover transition-all shadow-xl shadow-food-primary/30 hover:shadow-food-primary/50"
+              >
+                Заказать доставку
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <a
+                href="#hits"
+                className="inline-flex items-center gap-2 h-14 px-7 rounded-md border border-white/20 font-bold uppercase tracking-wider text-sm hover:border-white/60 transition-colors"
+              >
+                Хиты недели
+              </a>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-food-muted">
+              <span className="flex items-center gap-2">
+                <span className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-food-accent text-food-accent" />
+                  ))}
+                </span>
+                <span><b className="text-food-text">4.9</b> · 2500+ отзывов</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <Wallet className="w-4 h-4 text-food-primary" />
+                Оплата при получении
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Блюдо */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, rotate: -8 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 1.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="relative order-1 lg:order-2 mx-auto w-full max-w-[340px] sm:max-w-[440px] lg:max-w-[560px]"
+          >
+            <div className="relative aspect-square">
+              {/* Вращающаяся подпись по кругу */}
+              <svg
+                aria-hidden
+                viewBox="0 0 200 200"
+                className="absolute inset-[-7%] w-[114%] h-[114%] animate-spin-slow"
+              >
+                <defs>
+                  <path id="ring" d="M100,100 m-92,0 a92,92 0 1,1 184,0 a92,92 0 1,1 -184,0" />
+                </defs>
+                <text fill="#e8432e" fontSize="7.2" letterSpacing="4.2" fontFamily="var(--font-oswald)">
+                  <textPath href="#ring">ГОРЯЧО · С ОГНЯ · ЗА 35 МИНУТ · ГОРЯЧО · С ОГНЯ · ЗА 35 МИНУТ ·</textPath>
+                </text>
+              </svg>
+
+              <div className="absolute inset-[4%] rounded-full bg-black/80 blur-3xl translate-y-[6%]" />
+              <div className="relative w-full h-full rounded-full overflow-hidden ring-1 ring-white/10 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)]">
+                <Image
+                  src="/images/dishes/shashlik.jpg"
+                  alt="Шашлык из свинины на углях"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 90vw, 560px"
+                  className="object-cover scale-110"
+                />
+              </div>
+
+              {/* Маленькие тарелки-спутники */}
+              <div className="absolute -left-[6%] bottom-[2%] w-[30%] aspect-square rounded-full overflow-hidden ring-4 ring-food-bg shadow-2xl animate-float">
+                <Image src="/images/dishes/khachapuri.jpg" alt="" fill sizes="170px" className="object-cover" />
+              </div>
+              <div
+                className="absolute -right-[2%] top-[4%] w-[22%] aspect-square rounded-full overflow-hidden ring-4 ring-food-bg shadow-2xl animate-float"
+                style={{ animationDelay: '1.5s' }}
+              >
+                <Image src="/images/dishes/lobio.jpg" alt="" fill sizes="130px" className="object-cover" />
+              </div>
+
+              {/* Карточка быстрого заказа */}
+              <HeroOrderCard
+                className="absolute right-[-2%] sm:right-[-6%] bottom-[10%]"
+                item={heroDish}
+              />
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Ближний слой — крупные шампуры пролетают перед тарелкой */}
+        <FallingSkewers layer="front" />
       </section>
 
       <MarqueeBanner />
 
-      <SectionDivider variant="line-dot" />
-<section className="relative pt-6 md:pt-10 pb-16 md:pb-20">
-  <div className="max-w-7xl mx-auto px-4 md:px-8">
-    <div className="grid lg:grid-cols-2 gap-6 md:gap-10 items-stretch min-h-[600px] md:min-h-[680px]">
+      {/* ==================== ЦИФРЫ (бумага) ==================== */}
+      <TornEdge color={PAPER} className="-mt-6 relative z-10" />
+      <section className="texture-paper relative -mt-px">
+        <Leaf className="absolute right-[6%] top-8 w-16 h-16 rotate-[30deg] opacity-80 hidden md:block" />
+        <Leaf className="absolute left-[4%] bottom-10 w-12 h-12 -rotate-[40deg] opacity-70 hidden md:block" color="#5b8f3c" />
 
-      {/* ЛЕВАЯ ЧАСТЬ — визуальная панель */}
-      <motion.div
-        initial={{ opacity: 0, x: -40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="relative rounded-[36px] overflow-hidden h-[400px] md:h-auto"
-      >
-        {/* Фон — оранжевый градиент */}
-        <div className="absolute inset-0 bg-gradient-to-br from-food-primary via-food-accent to-food-primary-hover" />
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-24">
+          <motion.div {...fadeUp} className="text-center mb-14">
+            <h2 className="text-3xl md:text-5xl leading-tight font-normal">
+              Доставляем еду, которая
+              <br className="hidden md:block" /> приезжает <BrushWord>горячей</BrushWord>
+            </h2>
+          </motion.div>
 
-        {/* Точечный паттерн */}
-        <div
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 2px, transparent 2px)',
-            backgroundSize: '28px 28px',
-          }}
-        />
-
-        {/* Тонкие круги декора */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="w-[280px] h-[280px] md:w-[380px] md:h-[380px] rounded-full border border-white/20" />
-        </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] rounded-full border border-white/15" />
-        </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-full border border-white/20" />
-        </div>
-
-        {/* Центральный текст — вместо эмодзи */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white">
-            <div className="text-[80px] md:text-[120px] lg:text-[140px] font-extrabold leading-none tracking-tight">
-              Food
-            </div>
-            <div className="text-[40px] md:text-[60px] lg:text-[70px] font-extrabold leading-none tracking-tight opacity-90 italic">
-              Express
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-y-10 gap-x-6">
+            {[
+              { num: '35', unit: 'мин', text: 'среднее время доставки' },
+              { num: '12', unit: '', text: 'ресторанов-партнёров' },
+              { num: '1000', unit: '+', text: 'блюд в меню' },
+              { num: '97', unit: '%', text: 'заказов приезжают вовремя' },
+              { num: '4.9', unit: '', text: 'средняя оценка гостей' },
+            ].map((s, i) => (
+              <motion.div
+                key={s.text}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.08 }}
+                className={`${i === 4 ? 'col-span-2 md:col-span-1' : ''} text-center md:text-left`}
+              >
+                <div className="font-display font-light text-6xl md:text-7xl text-ink leading-none">
+                  {s.num}
+                  <span className="text-food-primary text-3xl md:text-4xl align-top ml-1">{s.unit}</span>
+                </div>
+                <div className="w-10 h-px bg-ink/40 my-4 mx-auto md:mx-0" />
+                <div className="text-ink-muted text-sm leading-snug max-w-[11rem] mx-auto md:mx-0">{s.text}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
+      </section>
+      <TornEdge color={WOOD} className="-mt-px relative z-10 bg-paper" />
 
-        {/* Верхняя плашка — статус */}
-        <div className="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-medium">
-          <span className="relative flex w-2 h-2">
-            <span className="absolute inset-0 rounded-full bg-green-300 animate-ping opacity-75" />
-            <span className="relative rounded-full w-2 h-2 bg-green-300" />
-          </span>
-          Доставим за 30–60 минут
-        </div>
-
-        {/* Нижняя плашка — статистика */}
-        <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20">
-            <div className="w-10 h-10 rounded-full bg-white/20 border border-white/40 flex items-center justify-center text-white font-bold">
-              👥
-            </div>
-            <div className="text-white">
-              <div className="text-xs opacity-80">Клиентов</div>
-              <div className="font-bold text-sm">2500+</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 text-white">
-            <Star className="w-4 h-4 fill-yellow-300 text-yellow-300" />
+      {/* ==================== ХИТЫ (дерево) ==================== */}
+      <section id="hits" className="texture-wood -mt-px scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24">
+          <motion.div {...fadeUp} className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
             <div>
-              <div className="text-xs opacity-80">Рейтинг</div>
-              <div className="font-bold text-sm">4.9 / 5</div>
+              <div className="eyebrow mb-4">Хиты недели</div>
+              <h2 className="text-4xl md:text-6xl leading-[1.05] text-white">
+                Заказывают <BrushWord>чаще всего</BrushWord>
+              </h2>
             </div>
+            <p className="text-white/60 max-w-sm">
+              Добавляйте прямо отсюда — корзина запомнит выбор,
+              а оформление займёт меньше минуты.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-14">
+            {hits.map((item, i) => (
+              <motion.div
+                key={item.id}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: (i % 4) * 0.08 }}
+              >
+                <DishTile item={item} restaurantName={restaurantName(item.restaurantId)} />
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-16">
+            <Link
+              href="/restaurants"
+              className="group inline-flex items-center gap-2.5 h-14 px-8 rounded-md border border-white/25 text-white font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-ink transition-colors"
+            >
+              Смотреть всё меню
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
-      </motion.div>
+      </section>
 
-      {/* ПРАВАЯ ЧАСТЬ — текст */}
-      <motion.div
-        initial={{ opacity: 0, x: 40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="flex flex-col justify-center py-6 md:py-10 lg:py-12"
-      >
-        {/* Верхняя метка */}
-        <div className="inline-flex items-center gap-2 text-food-primary text-sm font-semibold mb-6 tracking-wider uppercase w-fit">
-          <span className="w-8 h-px bg-food-primary" />
-          Сервис доставки
-        </div>
-
-        {/* Заголовок */}
-        <h1 className="text-[44px] md:text-[64px] lg:text-[76px] font-extrabold leading-[1] tracking-tight mb-6">
-          Вкусная еда
-          <br />
-          <span className="gradient-text">у вашей двери</span>
-        </h1>
-
-        {/* Подзаголовок */}
-        <p className="text-food-muted text-base md:text-lg leading-relaxed mb-10 max-w-md">
-          Более 50 ресторанов и 1000 блюд на выбор. Закажите за минуту,
-          оплата при получении, отслеживание заказа в реальном времени.
-        </p>
-
-        {/* Мини-преимущества */}
-        <div className="grid grid-cols-3 gap-4 mb-10 max-w-md">
+      {/* ==================== ИСТОРИЯ: ОГОНЬ ==================== */}
+      <section className="texture-wood -mt-px">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-24 space-y-20 md:space-y-28">
           {[
-            { num: '35', unit: 'мин', label: 'доставка' },
-            { num: '12', unit: '', label: 'ресторанов' },
-            { num: '4.9', unit: '/5', label: 'рейтинг' },
-          ].map((stat, i) => (
-            <div key={i} className="flex flex-col">
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl md:text-4xl font-extrabold text-food-primary">
-                  {stat.num}
-                </span>
-                {stat.unit && (
-                  <span className="text-lg font-bold text-food-primary">
-                    {stat.unit}
-                  </span>
-                )}
-              </div>
-              <div className="text-food-muted text-xs md:text-sm">
-                {stat.label}
-              </div>
+            {
+              img: '/images/restaurants/steak-house.jpg',
+              title: <>Мясо — только <BrushWord>на углях</BrushWord></>,
+              text: 'Шашлык и стейки готовят на открытом огне прямо перед отправкой. Курьер забирает заказ, пока мясо ещё шипит.',
+              tag: 'Тбилиси · Хинкальная №1',
+              href: '/restaurants?cuisine=georgian',
+            },
+            {
+              img: '/images/restaurants/pizza-mario.jpg',
+              title: <>Пицца из <BrushWord>дровяной</BrushWord> печи</>,
+              text: 'Тонкое тесто, 90 секунд при 400°C и термосумка, которая держит хруст до самой двери.',
+              tag: 'Pizza Mario · Pasta Bar',
+              href: '/restaurants?cuisine=pizza',
+            },
+            {
+              img: '/images/restaurants/wok-street.jpg',
+              title: <>Вок — на <BrushWord>живом огне</BrushWord></>,
+              text: 'Лапша и креветки обжариваются за пару минут на сильном пламени — поэтому приезжают с тем самым ароматом дымка.',
+              tag: 'Wok Street · Noodle House',
+              href: '/restaurants?cuisine=asian',
+            },
+          ].map((s, i) => (
+            <div
+              key={s.tag}
+              className={`grid md:grid-cols-2 gap-10 md:gap-16 items-center ${i % 2 ? 'md:[&>*:first-child]:order-2' : ''}`}
+            >
+              <motion.div {...fadeUp} className="relative">
+                <div className="absolute -inset-6 ember-glow opacity-50" />
+                <div className="relative aspect-[4/5] md:aspect-[5/6] rounded-xl overflow-hidden shadow-2xl shadow-black/70">
+                  <Image src={s.img} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                </div>
+              </motion.div>
+              <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}>
+                <div className="font-display text-food-primary/80 text-sm tracking-[0.2em] mb-4">0{i + 1}</div>
+                <h3 className="text-4xl md:text-5xl leading-[1.08] text-white mb-6">{s.title}</h3>
+                <p className="text-white/65 text-lg leading-relaxed mb-8 max-w-md">{s.text}</p>
+                <Link
+                  href={s.href}
+                  className="group inline-flex items-center gap-2 text-white font-semibold border-b border-food-primary pb-1 hover:text-food-primary transition-colors"
+                >
+                  {s.tag}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </motion.div>
             </div>
           ))}
         </div>
+      </section>
 
-        {/* Кнопки */}
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/restaurants"
-            className="group inline-flex items-center gap-2 px-7 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:shadow-food-primary/50 hover:scale-[1.03]"
-          >
-            <Search className="w-5 h-5" />
-            Выбрать ресторан
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            href="/orders"
-            className="inline-flex items-center gap-2 px-7 py-4 rounded-full border-2 border-food-border bg-food-surface font-semibold hover:border-food-primary transition-colors"
-          >
-            Мои заказы
-          </Link>
-        </div>
-
-        {/* Нижняя подпись */}
-        <div className="flex items-center gap-3 mt-10 text-sm text-food-muted">
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-food-primary text-food-primary" />
-            ))}
-          </div>
-          <span>Более 2500 довольных клиентов</span>
-        </div>
-      </motion.div>
-    </div>
-  </div>
-</section>
-
-      <SectionDivider variant="line-dot" />
-
-      {/* ==================== КАТЕГОРИИ КУХНИ ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex items-end justify-between mb-10"
-          >
+      {/* ==================== КАТЕГОРИИ ==================== */}
+      <section className="texture-slate bg-food-bg">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24">
+          <motion.div {...fadeUp} className="flex items-end justify-between gap-6 mb-10">
             <div>
-              <div className="flex items-center gap-3 text-food-primary text-sm font-semibold mb-3 tracking-wider uppercase">
-                <span className="w-8 h-px bg-food-primary" />
-                Категории
-              </div>
-              <h2 className="text-3xl md:text-5xl font-extrabold mb-3">
-                Выберите кухню
-              </h2>
-              <p className="text-food-muted max-w-lg">
-                От итальянской пиццы до японских суши — найдите то, что по вкусу
-              </p>
+              <div className="eyebrow mb-4">Кухни</div>
+              <h2 className="text-4xl md:text-6xl leading-[1.05]">Чего хочется сегодня?</h2>
             </div>
             <Link
               href="/restaurants"
-              className="hidden md:inline-flex items-center gap-1 text-food-primary font-semibold hover:gap-2 transition-all"
+              className="hidden md:inline-flex items-center gap-1.5 text-food-primary font-semibold hover:gap-2.5 transition-all"
             >
               Все рестораны <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-          {[
-  { id: 'pizza', name: 'Пицца', count: 2, image: '/images/categories/pizza.jpg' },
-  { id: 'sushi', name: 'Суши', count: 2, image: '/images/categories/sushi.jpg' },
-  { id: 'burger', name: 'Бургеры', count: 2, image: '/images/categories/burger.jpg' },
-  { id: 'asian', name: 'Азиатская', count: 2, image: '/images/categories/asian.jpg' },
-  { id: 'georgian', name: 'Грузинская', count: 2, image: '/images/categories/georgian.jpg' },
-  { id: 'coffee', name: 'Кофе и десерты', count: 2, image: '/images/categories/coffee.jpg' },
-].map((cat, i) => (
-  <motion.div key={cat.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}>
-    <Link
-      href={`/restaurants?cuisine=${cat.id}`}
-      className="group relative flex flex-col justify-end h-56 md:h-64 lg:h-72 rounded-3xl overflow-hidden bg-food-surface border border-food-border hover:border-food-primary transition-all"
-    >
-      <Image
-        src={cat.image}
-        alt={cat.name}
-        fill
-        sizes="(max-width: 768px) 50vw, 16vw"
-        className="object-cover group-hover:scale-110 transition-transform duration-700"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-      <div className="relative p-4 md:p-5">
-  <h3
-    className="font-extrabold text-base md:text-lg leading-tight mb-1"
-    style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.6)' }}
-  >
-    {cat.name}
-  </h3>
-  <div
-    className="flex items-center gap-1 text-xs transition-colors"
-    style={{ color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}
-  >
-    <span>Смотреть</span>
-    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-  </div>
-</div>
-    </Link>
-  </motion.div>
-))}
-          </div>
-        </div>
-      </section>
-
-      <SectionDivider variant="wave" />
-
-      {/* ==================== ПРЕИМУЩЕСТВА ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="grid md:grid-cols-3 gap-4 md:gap-6 bg-food-surface border border-food-border rounded-[32px] p-6 md:p-8"
-          >
+          <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 snap-x">
             {[
-              { icon: Clock, num: '35', unit: 'мин', title: 'Среднее время доставки', text: 'От ресторана до вашей двери', color: 'text-food-primary', bg: 'bg-food-primary/10' },
-              { icon: MapPin, num: '12', unit: '', title: 'Ресторанов в Москве', text: 'Работаем во всех районах города', color: 'text-food-accent', bg: 'bg-food-accent/10' },
-              { icon: Award, num: '4.9', unit: '/ 5', title: 'Средняя оценка', text: 'Более 2500 положительных отзывов', color: 'text-food-success', bg: 'bg-food-success/10' },
-            ].map((f, i) => (
+              { id: 'georgian', name: 'Грузинская', image: '/images/categories/georgian.jpg' },
+              { id: 'burger', name: 'Бургеры', image: '/images/categories/burger.jpg' },
+              { id: 'pizza', name: 'Пицца', image: '/images/categories/pizza.jpg' },
+              { id: 'sushi', name: 'Суши', image: '/images/categories/sushi.jpg' },
+              { id: 'asian', name: 'Азиатская', image: '/images/categories/asian.jpg' },
+              { id: 'coffee', name: 'Кофе и десерты', image: '/images/categories/coffee.jpg' },
+            ].map((cat, i) => (
               <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="flex items-start gap-5 p-2"
+                key={cat.id}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+                className="snap-start shrink-0 w-[46%] sm:w-[32%] md:w-auto"
               >
-                <div className={`w-14 h-14 rounded-2xl ${f.bg} flex items-center justify-center flex-shrink-0`}>
-                  <f.icon className={`w-7 h-7 ${f.color}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className={`text-4xl md:text-5xl font-extrabold ${f.color}`}>{f.num}</span>
-                    {f.unit && <span className={`text-xl md:text-2xl font-bold ${f.color}`}>{f.unit}</span>}
+                <Link
+                  href={`/restaurants?cuisine=${cat.id}`}
+                  className="group relative flex items-end h-64 md:h-80 rounded-xl overflow-hidden ring-1 ring-white/5 hover:ring-food-primary/60 transition-all"
+                >
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 16vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                  <div className="relative p-4 md:p-5 w-full flex items-end justify-between gap-2">
+                    <h3 className="font-display text-xl md:text-2xl leading-tight text-white">{cat.name}</h3>
+                    <ArrowRight className="w-5 h-5 text-food-primary shrink-0 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
                   </div>
-                  <div className="font-semibold text-base mb-1">{f.title}</div>
-                  <div className="text-food-muted text-sm leading-snug">{f.text}</div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <SectionDivider variant="triple" />
-
-      {/* ==================== КАК ЭТО РАБОТАЕТ ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-14"
-          >
-            <div className="text-food-primary text-sm font-semibold mb-2 tracking-wider uppercase">
-              Просто и быстро
-            </div>
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-3">Как это работает</h2>
-            <p className="text-food-muted max-w-xl mx-auto">Заказать еду — проще, чем кажется</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8 relative">
-            <div className="hidden md:block absolute top-20 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-food-primary/30 via-food-primary/50 to-food-primary/30" />
-            {[
-              { num: '01', title: 'Выберите ресторан', text: 'Найдите любимую кухню и откройте меню', icon: UtensilsCrossed },
-              { num: '02', title: 'Соберите заказ', text: 'Добавьте блюда в корзину и оформите доставку', icon: Sparkles },
-              { num: '03', title: 'Получите заказ', text: 'Курьер привезёт еду прямо к вашей двери', icon: TrendingUp },
-            ].map((step, i) => (
-              <motion.div
-                key={step.num}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="relative p-8 rounded-3xl bg-food-surface border border-food-border text-center"
-              >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-food-primary text-white text-xs font-bold rounded-full">
-                  ШАГ {step.num}
-                </div>
-                <div className="w-20 h-20 mx-auto rounded-3xl bg-food-primary/10 flex items-center justify-center mb-5">
-                  <step.icon className="w-9 h-9 text-food-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                <p className="text-food-muted text-sm">{step.text}</p>
+                </Link>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <SectionDivider variant="diamond" />
+      {/* ==================== ПРОМО ==================== */}
+      <PromoBanner />
 
       {/* ==================== ТОП-РЕСТОРАНЫ ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex items-end justify-between mb-8"
-          >
+      <section className="texture-slate bg-food-bg">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24">
+          <motion.div {...fadeUp} className="flex items-end justify-between gap-6 mb-10">
             <div>
-              <div className="text-food-primary text-sm font-semibold mb-2 tracking-wider uppercase">
-                Выбор гостей
-              </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold">Топ рестораны</h2>
+              <div className="eyebrow mb-4">Выбор гостей</div>
+              <h2 className="text-4xl md:text-6xl leading-[1.05]">Лучшие рестораны</h2>
             </div>
             <Link
               href="/restaurants"
-              className="hidden md:inline-flex items-center gap-1 text-food-primary font-semibold hover:gap-2 transition-all"
+              className="hidden md:inline-flex items-center gap-1.5 text-food-primary font-semibold hover:gap-2.5 transition-all"
             >
-              Все рестораны <ArrowRight className="w-4 h-4" />
+              Все {restaurants.length} <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {topRestaurants.map((r) => (
               <RestaurantCard key={r.id} restaurant={r} />
             ))}
           </div>
-        </div>
-      </section>
 
-      <SectionDivider variant="line-dot" />
-
-      {/* ==================== ПРОМО-БАННЕР ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="relative overflow-hidden rounded-[32px] border border-food-border bg-food-surface p-8 md:p-14"
-          >
-            <div
-              className="absolute -top-32 -right-32 w-96 h-96 rounded-full pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 70%)',
-                filter: 'blur(40px)',
-              }}
-            />
-            <div
-              className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle, rgba(220, 38, 38, 0.1) 0%, transparent 70%)',
-                filter: 'blur(40px)',
-              }}
-            />
-
-            <div className="relative z-10 grid lg:grid-cols-[1.5fr_1fr] gap-10 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-food-primary/10 text-food-primary text-xs font-bold uppercase tracking-wider mb-6">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Первый заказ
-                </div>
-                <h3 className="text-4xl md:text-6xl font-extrabold mb-5 leading-[1.05] tracking-tight">
-                  Скидка <span className="text-food-primary">10%</span>
-                  <br />
-                  на первый заказ
-                </h3>
-                <p className="text-food-muted mb-8 max-w-lg text-lg leading-relaxed">
-                  Используйте промокод{' '}
-                  <span className="inline-block font-mono font-bold text-food-text bg-food-surface-2 border border-dashed border-food-primary/40 px-3 py-1 rounded-lg">
-                    FIRST10
-                  </span>{' '}
-                  при оформлении — и получите скидку на всю корзину.
-                </p>
-                <div className="flex flex-wrap items-center gap-4">
-                  <Link
-                    href="/restaurants"
-                    className="group inline-flex items-center gap-2 px-7 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:shadow-food-primary/50 hover:scale-[1.03]"
-                  >
-                    Заказать сейчас
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-              </div>
-
-              <div className="hidden lg:flex items-center justify-center relative">
-                <div className="relative">
-                  <div className="text-[220px] font-extrabold leading-none gradient-text select-none">
-                    10
-                  </div>
-                  <div className="absolute -top-4 -right-8 text-6xl font-extrabold text-food-primary select-none">
-                    %
-                  </div>
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-semibold text-food-muted tracking-widest uppercase">
-                    на всю корзину
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative z-10 mt-10 pt-8 border-t border-food-border grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              {[
-                { label: 'Срок действия', value: 'до конца месяца' },
-                { label: 'Минимальный заказ', value: 'от 700 ₽' },
-                { label: 'Применяется', value: 'ко всей корзине' },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col">
-                  <span className="text-food-muted text-xs uppercase tracking-wider mb-1">
-                    {item.label}
-                  </span>
-                  <span className="font-semibold">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <SectionDivider variant="wave" />
-
-      {/* ==================== ОТЗЫВЫ ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-14"
-          >
-            <div className="text-food-primary text-sm font-semibold mb-2 tracking-wider uppercase">
-              Отзывы
-            </div>
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-3">
-              Что говорят клиенты
-            </h2>
-            <p className="text-food-muted max-w-xl mx-auto">
-              Более 2500 довольных покупателей по всей Москве
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
+          {/* Как это работает — коротко */}
+          <div className="grid md:grid-cols-3 gap-px mt-16 rounded-xl overflow-hidden bg-food-border">
             {[
-              { name: 'Анна', city: 'Москва', text: 'Заказываю каждую неделю — всегда быстро и вкусно. Курьеры вежливые, еда горячая.', emoji: '🍕' },
-              { name: 'Дмитрий', city: 'Санкт-Петербург', text: 'Суши-сет пришёл в идеальном состоянии. Рыба свежая, всё аккуратно упаковано.', emoji: '🍣' },
-              { name: 'Екатерина', city: 'Москва', text: 'Обожаю Coffee Lab. Капучино и круассан — идеальный завтрак. Доставка за 20 минут!', emoji: '☕' },
-              { name: 'Игорь', city: 'Москва', text: 'Бургеры из Burger House — лучшие в городе. Сочные, большие, доставка быстрая.', emoji: '🍔' },
-              { name: 'Ольга', city: 'Московская область', text: 'Заказывали хинкали из Тбилиси на праздник. Всё приехало горячим и очень вкусным!', emoji: '🥟' },
-              { name: 'Сергей', city: 'Москва', text: 'Удобный сайт, быстрое оформление. Отслеживание заказа — очень круто, видно каждый этап.', emoji: '🚀' },
-            ].map((review, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="p-6 rounded-3xl bg-food-surface border border-food-border"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-food-primary text-food-primary" />
-                  ))}
-                </div>
-                <p className="text-food-muted text-sm leading-relaxed mb-6">
-                  «{review.text}»
-                </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-food-border">
-                  <div className="w-10 h-10 rounded-full bg-food-primary/10 flex items-center justify-center text-xl">
-                    {review.emoji}
+              { icon: MapPin, title: 'Выберите блюда', text: '12 ресторанов и сотни позиций — от хинкали до чизкейка' },
+              { icon: Clock, title: 'Оформите за минуту', text: 'Имя, телефон и адрес — без регистрации и звонков' },
+              { icon: Wallet, title: 'Платите при получении', text: 'Наличными или картой курьеру, когда еда уже у вас' },
+            ].map((s, i) => (
+              <div key={s.title} className="bg-food-surface p-7 md:p-8 flex gap-5">
+                <div className="font-display font-light text-5xl text-food-primary/80 leading-none">{i + 1}</div>
+                <div>
+                  <div className="font-display text-xl mb-1.5 flex items-center gap-2">
+                    {s.title}
                   </div>
-                  <div>
-                    <div className="text-sm font-semibold">{review.name}</div>
-                    <div className="text-xs text-food-muted">{review.city}</div>
-                  </div>
+                  <p className="text-food-muted text-sm leading-relaxed">{s.text}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <SectionDivider variant="triple" />
-
-      {/* ==================== FAQ ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-3xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-14"
-          >
-            <div className="text-food-primary text-sm font-semibold mb-2 tracking-wider uppercase">
-              Вопросы и ответы
-            </div>
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-3">
-              Часто спрашивают
+      {/* ==================== ОТЗЫВЫ (бумага) ==================== */}
+      <TornEdge color={PAPER} className="relative z-10 bg-food-bg" />
+      <section className="texture-paper -mt-px">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24">
+          <motion.div {...fadeUp} className="text-center mb-14">
+            <div className="eyebrow mb-4">Отзывы</div>
+            <h2 className="text-4xl md:text-6xl leading-[1.05]">
+              Говорят, <BrushWord>очень вкусно</BrushWord>
             </h2>
-            <p className="text-food-muted">
-              Если не нашли ответ — напишите нам в Telegram
-            </p>
           </motion.div>
 
-          <div className="space-y-3">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { name: 'Анна', where: 'Москва, Хамовники', text: 'Заказываю каждую неделю — всегда быстро и вкусно. Курьеры вежливые, еда горячая.', img: '/images/dishes/margherita.jpg', rot: '-rotate-1' },
+              { name: 'Ольга', where: 'Люберцы', text: 'Заказывали хинкали из «Тбилиси» на праздник. Всё приехало горячим, гости просили добавки!', img: '/images/dishes/khinkali.jpg', rot: 'rotate-1' },
+              { name: 'Игорь', where: 'Москва, Сокол', text: 'Бургеры из Burger House — лучшие в городе. Сочные, большие, доставка за 25 минут.', img: '/images/dishes/double-burger.jpg', rot: '-rotate-[0.5deg]' },
+            ].map((r, i) => (
+              <motion.figure
+                key={r.name}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.1 }}
+                className={`bg-white/70 p-6 md:p-7 shadow-[0_18px_40px_-18px_rgba(60,40,20,0.45)] ${r.rot}`}
+              >
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-food-primary text-food-primary" />
+                  ))}
+                </div>
+                <blockquote className="text-ink text-lg leading-relaxed mb-6">«{r.text}»</blockquote>
+                <figcaption className="flex items-center gap-3">
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                    <Image src={r.img} alt="" fill sizes="48px" className="object-cover" />
+                  </div>
+                  <div>
+                    <div className="font-display text-lg text-ink leading-none mb-1">{r.name}</div>
+                    <div className="text-xs text-ink-muted">{r.where}</div>
+                  </div>
+                </figcaption>
+              </motion.figure>
+            ))}
+          </div>
+        </div>
+      </section>
+      <TornEdge color={COAL} className="-mt-px relative z-10 bg-paper" />
+
+      {/* ==================== FAQ ==================== */}
+      <section className="texture-slate bg-food-bg -mt-px">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-24 grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-16">
+          <motion.div {...fadeUp}>
+            <div className="eyebrow mb-4">Вопросы</div>
+            <h2 className="text-4xl md:text-5xl leading-[1.05] mb-5">Часто спрашивают</h2>
+            <p className="text-food-muted mb-8 max-w-sm">
+              Не нашли ответ? Напишите нам в Telegram <span className="text-food-text">@foodexpress</span> — ответим за пару минут.
+            </p>
+          </motion.div>
+          <motion.div {...fadeUp} className="border-t border-food-border">
             {[
               { q: 'Сколько ждать доставку?', a: 'В среднем 30–60 минут. Точное время зависит от ресторана и вашего района. Отслеживать заказ можно на странице «Мои заказы».' },
               { q: 'Сколько стоит доставка?', a: 'От 0 до 199 ₽ — зависит от ресторана. У некоторых заведений доставка бесплатная. Итоговая стоимость видна в корзине.' },
@@ -642,168 +468,161 @@ export default function HomePage() {
               { q: 'Есть ли минимальная сумма заказа?', a: 'Да, у каждого ресторана своя минимальная сумма — от 400 до 1500 ₽. Она указана на карточке ресторана.' },
               { q: 'Работаете ли вы ночью?', a: 'Сейчас сервис работает ежедневно с 10:00 до 23:00. В планах — расширение до круглосуточного режима.' },
             ].map((item, i) => (
-              <FAQItem key={i} question={item.q} answer={item.a} defaultOpen={i === 0} />
+              <FAQItem key={item.q} question={item.q} answer={item.a} defaultOpen={i === 0} />
             ))}
-          </div>
-        </div>
-      </section>
-
-      <SectionDivider variant="diamond" />
-
-      {/* ==================== CTA ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="relative overflow-hidden rounded-[32px] bg-[#1c1917] text-white p-8 md:p-16"
-          >
-            <div className="absolute inset-0 opacity-30 pointer-events-none">
-              <div
-                className="absolute -top-20 -right-20 w-96 h-96 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(249, 115, 22, 0.6) 0%, transparent 70%)',
-                  filter: 'blur(60px)',
-                }}
-              />
-              <div
-                className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(220, 38, 38, 0.5) 0%, transparent 70%)',
-                  filter: 'blur(60px)',
-                }}
-              />
-            </div>
-
-            <div className="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur rounded-full text-xs font-semibold mb-6 !text-white">
-                  ⚡ Быстро и удобно
-                </div>
-                <h2
-                  className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight !text-white"
-                  style={{ color: '#ffffff' }}
-                >
-                  Заказывайте еду
-                  <br />
-                  <span className="!text-food-primary" style={{ color: '#f97316' }}>
-                    в один клик
-                  </span>
-                </h2>
-                <p
-                  className="mb-8 text-lg leading-relaxed max-w-lg !text-white/70"
-                  style={{ color: 'rgba(255,255,255,0.7)' }}
-                >
-                  Сохраняйте любимые рестораны, повторяйте заказы в один клик
-                  и следите за доставкой в реальном времени.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    href="/restaurants"
-                    className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all"
-                  >
-                    Начать заказ
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="/orders"
-                    className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/20 text-white font-semibold hover:border-white/40 transition-colors"
-                  >
-                    Мои заказы
-                  </Link>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                {[
-                  { num: '2500+', label: 'Довольных клиентов' },
-                  { num: '12', label: 'Ресторанов-партнёров' },
-                  { num: '35', label: 'Минут среднее время' },
-                  { num: '4.9', label: 'Средняя оценка' },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="p-5 rounded-2xl bg-white/5 backdrop-blur border border-white/10"
-                  >
-                    <div
-                      className="text-3xl md:text-4xl font-extrabold mb-1"
-                      style={{ color: '#ffffff' }}
-                    >
-                      {stat.num}
-                    </div>
-                    <div
-                      className="text-xs leading-tight"
-                      style={{ color: 'rgba(255,255,255,0.6)' }}
-                    >
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
 
-      <SectionDivider variant="line-dot" />
-
-      {/* ==================== ГЕОГРАФИЯ ==================== */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+      {/* ==================== ФИНАЛЬНЫЙ CTA ==================== */}
+      <section className="relative isolate overflow-hidden">
+        <Image
+          src="/images/categories/burger.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover -z-20"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/80 to-black/30" />
+        <Embers className="-z-10" />
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-24 md:py-36">
+          <motion.div {...fadeUp} className="max-w-2xl">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl leading-[1.02] text-white mb-6">
+              Пока вы читали,
+              <br />
+              курьер уже <BrushWord>мог бы ехать</BrushWord>
+            </h2>
+            <p className="text-white/70 text-lg mb-10 max-w-md">
+              Выберите ресторан — и через 35 минут ужин будет на столе.
+            </p>
+            <Link
+              href="/restaurants"
+              className="group inline-flex items-center gap-2.5 h-14 px-9 rounded-md bg-food-primary text-white font-bold uppercase tracking-wider text-sm hover:bg-food-primary-hover transition-all shadow-xl shadow-food-primary/40"
             >
-              <div className="text-food-primary text-sm font-semibold mb-2 tracking-wider uppercase">
-                География
-              </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-5">
-                Доставляем по всей Москве и области
-              </h2>
-              <p className="text-food-muted mb-8 leading-relaxed">
-                Работаем с 12 ресторанами в разных районах города.
-                Среднее время доставки — 35 минут. В отдалённые районы — до 60 минут.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                {['Центр', 'Север', 'Юг', 'Запад', 'Восток', 'Московская область'].map((area) => (
-                  <div key={area} className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-food-primary" />
-                    <span>{area}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="relative"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-3xl bg-gradient-to-br from-food-primary to-food-accent h-64 flex items-center justify-center text-white">
-                  <div className="text-center">
-                    <div className="text-6xl mb-2">🏙️</div>
-                    <div className="text-sm uppercase tracking-wider opacity-80">Москва</div>
-                  </div>
-                </div>
-                <div className="rounded-3xl bg-gradient-to-br from-food-accent to-food-primary h-64 mt-8 flex items-center justify-center text-white">
-                  <div className="text-center">
-                    <div className="text-6xl mb-2">🚚</div>
-                    <div className="text-sm uppercase tracking-wider opacity-80">Доставка</div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+              Выбрать ресторан
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
         </div>
       </section>
     </main>
+  );
+}
+
+/* Плавающая карточка «закажи прямо сейчас» в первом экране */
+function HeroOrderCard({
+  item,
+  className = '',
+}: {
+  item: (typeof menuItems)[number];
+  className?: string;
+}) {
+  const addItem = useCart((s) => s.addItem);
+  const [added, setAdded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8, duration: 0.6 }}
+      className={`flex items-center gap-3 p-2.5 pr-3 rounded-xl bg-[#1a1614]/90 backdrop-blur-md ring-1 ring-white/10 shadow-2xl shadow-black/60 ${className}`}
+    >
+      <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+        <Image src={item.image} alt="" fill sizes="48px" className="object-cover" />
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] uppercase tracking-[0.18em] text-food-accent">Хит · Тбилиси</div>
+        <div className="font-display text-[15px] leading-tight truncate max-w-[9rem]">{item.name}</div>
+        <div className="text-sm font-bold">{item.price} ₽</div>
+      </div>
+      <button
+        onClick={() => {
+          addItem({
+            menuItemId: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            weight: item.weight,
+            restaurantId: item.restaurantId,
+            restaurantName: restaurantName(item.restaurantId),
+          });
+          setAdded(true);
+          setTimeout(() => setAdded(false), 1200);
+        }}
+        aria-label={`Добавить «${item.name}» в корзину`}
+        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${
+          added ? 'bg-food-success text-[#0f0d0c]' : 'bg-food-primary text-white hover:bg-food-primary-hover hover:scale-110'
+        }`}
+      >
+        {added ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+      </button>
+    </motion.div>
+  );
+}
+
+/* Промо-баннер с копированием промокода */
+function PromoBanner() {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText('FIRST10');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      /* буфер обмена может быть недоступен — просто ничего не делаем */
+    }
+  };
+
+  return (
+    <section className="relative isolate overflow-hidden bg-food-primary">
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 opacity-20"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 20% 30%, #ffb36b 0%, transparent 45%), radial-gradient(circle at 90% 80%, #7a120a 0%, transparent 50%)',
+        }}
+      />
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-14 md:py-20 grid md:grid-cols-[1.3fr_1fr] gap-10 items-center">
+        <motion.div {...fadeUp}>
+          <div className="font-display uppercase tracking-[0.22em] text-sm text-white/80 mb-4">Первый заказ</div>
+          <h2 className="text-white text-5xl md:text-7xl leading-[0.98] mb-6">
+            −10% на всю
+            <br />
+            корзину
+          </h2>
+          <p className="text-white/85 text-lg mb-8 max-w-md">
+            Введите промокод при оформлении. Действует до конца месяца при заказе от 700 ₽.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={copy}
+              className="inline-flex items-center gap-3 h-14 px-6 rounded-md border-2 border-dashed border-white/70 text-white font-display text-xl tracking-[0.2em] hover:bg-white/10 transition-colors"
+              aria-label="Скопировать промокод FIRST10"
+            >
+              FIRST10
+              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5 opacity-80" />}
+            </button>
+            <Link
+              href="/restaurants"
+              className="group inline-flex items-center gap-2.5 h-14 px-8 rounded-md bg-[#0f0d0c] text-white font-bold uppercase tracking-wider text-sm hover:bg-black transition-colors"
+            >
+              Использовать
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </motion.div>
+
+        <motion.div {...fadeUp} className="relative hidden md:block">
+          <div className="relative mx-auto w-[85%] aspect-square rounded-full overflow-hidden ring-[10px] ring-white/15 shadow-2xl shadow-black/40 rotate-12">
+            <Image src="/images/dishes/pepperoni.jpg" alt="" fill sizes="420px" className="object-cover" />
+          </div>
+          <div className="absolute top-[6%] left-[2%] w-28 h-28 rounded-full bg-[#0f0d0c] flex flex-col items-center justify-center text-white -rotate-12 shadow-xl">
+            <span className="font-display text-4xl leading-none">10%</span>
+            <span className="text-[10px] uppercase tracking-widest text-white/70 mt-1">скидка</span>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

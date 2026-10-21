@@ -59,13 +59,13 @@ export default function OrderPage({
         <div className="w-24 h-24 mx-auto rounded-full bg-food-surface-2 flex items-center justify-center mb-6">
           <AlertCircle className="w-12 h-12 text-food-muted" />
         </div>
-        <h1 className="text-3xl font-extrabold mb-3">Заказ не найден</h1>
+        <h1 className="text-3xl mb-3">Заказ не найден</h1>
         <p className="text-food-muted mb-8">
           Возможно, ссылка устарела или заказ был удалён.
         </p>
         <Link
           href="/restaurants"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-md bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all"
         >
           К ресторанам
         </Link>
@@ -99,7 +99,7 @@ export default function OrderPage({
           </span>
           <span className="text-xs text-food-muted">{orderDate}</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
+        <h1 className="text-4xl md:text-5xl mb-2">
           {order.status === 'delivered'
             ? 'Заказ доставлен!'
             : order.status === 'delivering'
@@ -253,6 +253,12 @@ export default function OrderPage({
               )}
             </span>
           </div>
+          {!!order.discount && (
+            <div className="flex justify-between text-sm text-food-success">
+              <span>Скидка по промокоду</span>
+              <span>−{order.discount} ₽</span>
+            </div>
+          )}
           <div className="flex justify-between items-center pt-3 border-t border-food-border">
             <span className="font-bold">Итого</span>
             <span className="font-extrabold text-2xl text-food-primary">
@@ -266,13 +272,13 @@ export default function OrderPage({
       <div className="mt-6 flex flex-col md:flex-row gap-3">
         <Link
           href="/restaurants"
-          className="flex-1 flex items-center justify-center gap-2 py-4 rounded-full border-2 border-food-border hover:border-food-primary font-semibold transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 py-4 rounded-md border-2 border-food-border hover:border-food-primary font-semibold transition-colors"
         >
           Заказать ещё
         </Link>
         <Link
           href="/orders"
-          className="flex-1 flex items-center justify-center gap-2 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all"
+          className="flex-1 flex items-center justify-center gap-2 py-4 rounded-md bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all"
         >
           Мои заказы
         </Link>

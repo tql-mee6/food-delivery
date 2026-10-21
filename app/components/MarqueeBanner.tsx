@@ -1,52 +1,32 @@
 'use client';
 
-import { Sparkles } from 'lucide-react';
-
+/* Бегущая строка — красная лента, как наклейка на крафт-пакете */
 export default function MarqueeBanner() {
-  // Дублируем текст, чтобы анимация была бесконечной
-  const items = Array(6).fill(null);
+  const phrases = [
+    'Сайт разработала Проничева Маргарита',
+    'ИС1-25',
+    'Учебный проект',
+    'Горячо — с огня и из печи',
+    'Доставка за 35 минут',
+    'Промокод FIRST10 — минус 10%',
+  ];
+  const items = [...phrases, ...phrases];
 
   return (
-    <section className="relative py-5 md:py-6 border-y border-food-border bg-food-surface overflow-hidden">
-      {/* Виньетки по краям */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-food-surface to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-food-surface to-transparent z-10 pointer-events-none" />
-
-      {/* Бегущая строка */}
+    <section
+      aria-label="Бегущая строка"
+      className="relative py-3.5 md:py-4 bg-food-primary overflow-hidden -rotate-1 scale-[1.02] my-2 shadow-xl shadow-black/40"
+    >
       <div className="flex animate-marquee whitespace-nowrap">
-        {[...Array(2)].map((_, dupIdx) => (
-          <div key={dupIdx} className="flex shrink-0">
-            {items.map((_, i) => (
-              <div key={i} className="flex items-center gap-6 md:gap-10 px-6 md:px-10">
-                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-food-primary flex-shrink-0" />
-
-                <span className="text-base md:text-xl font-bold tracking-wide">
-                  Сайт разработала{' '}
-                  <span className="text-food-primary">Проничева Маргарита</span>
+        {[0, 1].map((dup) => (
+          <div key={dup} className="flex shrink-0" aria-hidden={dup === 1}>
+            {items.map((text, i) => (
+              <span key={i} className="flex items-center gap-6 md:gap-8 px-3 md:px-4">
+                <span className="font-display uppercase tracking-[0.14em] text-sm md:text-lg text-white">
+                  {text}
                 </span>
-
-                <span className="text-food-muted text-sm md:text-base font-mono">
-                  ИС1-25
-                </span>
-
-                <span className="w-2 h-2 rounded-full bg-food-primary flex-shrink-0" />
-
-                <span className="text-base md:text-xl font-bold tracking-wide">
-                  Учебный проект
-                </span>
-
-                <span className="text-food-muted text-sm md:text-base">
-                  Сервис доставки еды
-                </span>
-
-                <span className="w-2 h-2 rounded-full bg-food-primary flex-shrink-0" />
-
-                <span className="text-base md:text-xl font-bold tracking-wide">
-                  Food<span className="text-food-primary">Express</span>
-                </span>
-
-                <span className="w-2 h-2 rounded-full bg-food-primary flex-shrink-0" />
-              </div>
+                <span className="text-white/70 text-lg">✦</span>
+              </span>
             ))}
           </div>
         ))}

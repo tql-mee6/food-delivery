@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
   ArrowLeft, User, Phone, MapPin, MessageSquare,
-  Bike, Store, ArrowRight, Shield
+  Bike, Store, ArrowRight, Shield, Tag, Check
 } from 'lucide-react';
 import { useCart } from '@/lib/cartStore';
 import { useOrders } from '@/lib/ordersStore';
@@ -38,6 +38,9 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderCreated, setOrderCreated] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -62,7 +65,26 @@ export default function CheckoutPage() {
   const restaurant = restaurants.find((r) => r.id === items[0].restaurantId);
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.deliveryFee ?? 0;
-  const total = subtotal + deliveryFee;
+  // Промокод FIRST10: −10% на товары при заказе от 700 ₽
+  const PROMO_MIN = 700;
+  const discount = promoApplied && subtotal >= PROMO_MIN ? Math.round(subtotal * 0.1) : 0;
+  const total = subtotal - discount + deliveryFee;
+
+  const applyPromo = () => {
+    const code = promoInput.trim().toUpperCase();
+    if (code !== 'FIRST10') {
+      setPromoError('Такого промокода нет');
+      setPromoApplied(false);
+      return;
+    }
+    if (subtotal < PROMO_MIN) {
+      setPromoError(`Промокод действует при заказе от ${PROMO_MIN} ₽`);
+      setPromoApplied(false);
+      return;
+    }
+    setPromoError('');
+    setPromoApplied(true);
+  };
 
   const update = (field: keyof FormData, value: string) => {
     setForm((f) => ({ ...f, [field]: value }));
@@ -116,6 +138,7 @@ export default function CheckoutPage() {
       },
         subtotal,
         deliveryFee,
+        discount: discount || undefined,
         total,
     });
 
@@ -139,7 +162,7 @@ router.push(`/order/${orderId}`);  // ← и переходим
         В корзину
       </Link>
 
-      <h1 className="text-3xl md:text-4xl font-extrabold mb-8">
+      <h1 className="text-4xl md:text-5xl mb-8">
         Оформление заказа
       </h1>
 
@@ -275,6 +298,48 @@ router.push(`/order/${orderId}`);  // ← и переходим
               ))}
             </div>
 
+            {/* Промокод */}
+            <div className="pt-5 pb-5 border-t border-food-border">
+              {promoApplied && discount > 0 ? (
+                <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-md bg-food-success/10 text-food-success text-sm">
+                  <span className="flex items-center gap-2 font-semibold">
+                    <Check className="w-4 h-4" /> FIRST10 применён
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setPromoApplied(false); setPromoInput(''); }}
+                    className="text-food-muted hover:text-food-text text-xs"
+                  >
+                    Убрать
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-food-muted pointer-events-none" />
+                      <input
+                        value={promoInput}
+                        onChange={(e) => { setPromoInput(e.target.value); setPromoError(''); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyPromo(); } }}
+                        placeholder="Промокод"
+                        aria-label="Промокод"
+                        className="w-full h-11 pl-9 pr-3 rounded-md bg-food-bg border border-food-border focus:border-food-primary focus:outline-none uppercase tracking-wider text-sm"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      className="h-11 px-4 rounded-md border border-food-border hover:border-food-primary text-sm font-semibold transition-colors"
+                    >
+                      Применить
+                    </button>
+                  </div>
+                  {promoError && <p className="mt-2 text-xs text-food-primary">{promoError}</p>}
+                </>
+              )}
+            </div>
+
             {/* Итого */}
             <div className="pt-5 border-t border-food-border space-y-2">
               <div className="flex justify-between text-sm text-food-muted">
@@ -294,6 +359,12 @@ router.push(`/order/${orderId}`);  // ← и переходим
                   )}
                 </span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-sm text-food-success">
+                  <span>Скидка FIRST10</span>
+                  <span>−{discount} ₽</span>
+                </div>
+              )}
               <div className="flex justify-between items-center pt-3 border-t border-food-border">
                 <span className="font-bold">Итого</span>
                 <span className="font-extrabold text-2xl text-food-primary">
@@ -305,7 +376,7 @@ router.push(`/order/${orderId}`);  // ← и переходим
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-5 w-full flex items-center justify-center gap-2 py-4 rounded-full bg-food-primary text-white font-bold text-lg hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
+              className="mt-5 w-full flex items-center justify-center gap-2 py-4 rounded-md bg-food-primary text-white font-bold text-lg hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 'Оформляем...'

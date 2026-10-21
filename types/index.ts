@@ -58,6 +58,8 @@ export type Order = {
   };
   subtotal: number;
   deliveryFee: number;
+  /** Скидка по промокоду, ₽ */
+  discount?: number;
   total: number;
   status: OrderStatus;
   statusHistory: StatusEntry[];

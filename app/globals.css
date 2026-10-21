@@ -1,66 +1,147 @@
 @import "tailwindcss";
 
+/*
+  Тема «Угли»: тёмный графит, тёплая бумага и огненно-красный акцент.
+  Названия токенов food-* сохранены, поэтому все страницы
+  (корзина, оформление, заказы) подхватывают новую тему автоматически.
+*/
 @theme {
-  --color-food-bg: #fef7ee;
-  --color-food-surface: #ffffff;
-  --color-food-surface-2: #fff5e6;
-  --color-food-primary: #f97316;
-  --color-food-primary-hover: #ea580c;
-  --color-food-accent: #dc2626;
-  --color-food-success: #16a34a;
-  --color-food-text: #1c1917;
-  --color-food-muted: #78716c;
-  --color-food-border: #f5e6d3;
+  --color-food-bg: #0f0d0c;
+  --color-food-surface: #1a1614;
+  --color-food-surface-2: #241e1b;
+  --color-food-primary: #e8432e;
+  --color-food-primary-hover: #ff5a3f;
+  --color-food-accent: #f4a340;
+  --color-food-success: #5bbf72;
+  --color-food-text: #f4ede4;
+  --color-food-muted: #a69a8f;
+  --color-food-border: #2f2824;
 
-  --font-display: var(--font-manrope);
-  --font-body: var(--font-inter);
+  /* Светлая «бумага» для контрастных секций */
+  --color-paper: #f1eadf;
+  --color-paper-2: #e6dccd;
+  --color-ink: #1b1613;
+  --color-ink-muted: #6e6259;
+
+  --font-display: var(--font-oswald);
+  --font-body: var(--font-manrope);
 }
 
 html {
-  background-color: #fef7ee;
-  color-scheme: light;
-  scroll-behavior: smooth;
+  background-color: #0f0d0c;
+  color-scheme: dark;
 }
 
 body {
-  background-color: #fef7ee;
-  background-image: 
-    radial-gradient(circle at 20% 10%, rgba(249, 115, 22, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(220, 38, 38, 0.03) 0%, transparent 40%);
-  background-attachment: fixed;
-  color: #1c1917;
+  background-color: #0f0d0c;
+  color: #f4ede4;
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: #1c1917;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
+/* ===== Текстуры ===== */
+
+/* Мелкое зерно поверх тёмных секций — как сланцевая доска */
+.texture-slate {
+  position: relative;
+  isolation: isolate;
+}
+.texture-slate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Тёмное дерево — вытянутый по горизонтали шум */
+.texture-wood {
+  position: relative;
+  isolation: isolate;
+  background-color: #1d1410;
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(120, 66, 34, 0.35), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(90, 44, 22, 0.4), transparent 55%);
+}
+.texture-wood::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.22' numOctaves='4' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.03 0 0 0 0 0.02 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+}
+
+/* Бумага */
+.texture-paper {
+  position: relative;
+  isolation: isolate;
+  background-color: #f1eadf;
+  color: #1b1613;
+}
+.texture-paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.6;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+.texture-paper h1, .texture-paper h2, .texture-paper h3 { color: #1b1613; }
+
+/* Тёплое свечение углей */
+.ember-glow {
+  /* мягкий градиент без filter: blur — так дешевле для браузера */
+  background: radial-gradient(circle at center, rgba(232, 67, 46, 0.3) 0%, rgba(232, 67, 46, 0.14) 25%, rgba(244, 163, 64, 0.06) 45%, transparent 70%);
+}
+
+/* Подпись-«метка» над заголовками */
+.eyebrow {
+  font-family: var(--font-display), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #e8432e;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.eyebrow::before {
+  content: '';
+  width: 2rem;
+  height: 1px;
+  background: currentColor;
+}
+
+/* ===== Скроллбар, выделение ===== */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #fef7ee; }
-::-webkit-scrollbar-thumb { background: #f5e6d3; border-radius: 5px; }
-::-webkit-scrollbar-thumb:hover { background: #f97316; }
+::-webkit-scrollbar-track { background: #0f0d0c; }
+::-webkit-scrollbar-thumb { background: #2f2824; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #e8432e; }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-.gradient-text {
-  background: linear-gradient(to right, #f97316, #dc2626);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 ::selection {
-  background-color: rgba(249, 115, 22, 0.3);
-  color: #1c1917;
+  background-color: rgba(232, 67, 46, 0.45);
+  color: #fff;
 }
 
 input, textarea, select, button { font-family: inherit; }
-input::placeholder, textarea::placeholder { color: #a8a29e; }
+input::placeholder, textarea::placeholder { color: #6f645b; }
+select option { background: #1a1614; color: #f4ede4; }
 
 .line-clamp-1 {
   display: -webkit-box;
@@ -75,21 +156,56 @@ input::placeholder, textarea::placeholder { color: #a8a29e; }
   overflow: hidden;
 }
 
-/* Бегущая строка */
+/* ===== Анимации ===== */
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-
 .animate-marquee {
-  animation: marquee 25s linear infinite;
+  animation: marquee 40s linear infinite;
   width: max-content;
 }
+.animate-marquee:hover { animation-play-state: paused; }
 
-.animate-marquee:hover {
-  animation-play-state: paused;
+/* Искры, поднимающиеся от углей */
+@keyframes ember-rise {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate3d(var(--drift, 20px), -70vh, 0) scale(0.2); opacity: 0; }
+}
+.ember {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #ffd28a 0%, #ff7a3d 45%, rgba(232, 67, 46, 0) 70%);
+  animation: ember-rise linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Медленное вращение кругового текста */
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 22s linear infinite; }
+
+/* Лёгкое «парение» */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ember, .animate-spin-slow, .animate-float, .animate-marquee { animation: none; }
+}
+
+/* Падающий шашлык на первом экране */
+@keyframes skewer-fall {
+  0% { transform: translate3d(0, -60vh, 0) rotate(var(--r0, 0deg)); }
+  100% { transform: translate3d(var(--dx, 0px), 125vh, 0) rotate(var(--r1, 0deg)); }
+}
+.skewer-fall {
+  animation: skewer-fall linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skewer-fall { animation: none; display: none; }
 }

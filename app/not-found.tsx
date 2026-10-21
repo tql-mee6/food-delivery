@@ -39,14 +39,14 @@ export default function NotFound() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-md bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-105"
             >
               <Home className="w-5 h-5" />
               На главную
             </Link>
             <Link
               href="/restaurants"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-food-border bg-food-surface font-semibold hover:border-food-primary transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-md border-2 border-food-border bg-food-surface font-semibold hover:border-food-primary transition-colors"
             >
               <Search className="w-5 h-5" />
               К ресторанам

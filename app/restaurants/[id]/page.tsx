@@ -2,6 +2,7 @@
 
 import { use, useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
   ArrowLeft, Star, Clock, Bike, MapPin, Heart
@@ -33,110 +34,97 @@ export default function RestaurantPage({
   }, [menu, activeCategory]);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 md:px-8 py-6">
-      {/* Назад */}
-      <Link
-        href="/restaurants"
-        className="inline-flex items-center gap-2 text-food-muted hover:text-food-primary transition-colors mb-6 text-sm font-semibold"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Все рестораны
-      </Link>
+    <main>
+      {/* Обложка ресторана */}
+      <section className="relative isolate overflow-hidden">
+        <Image
+          src={restaurant.image}
+          alt={restaurant.name}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover -z-20"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-food-bg via-black/70 to-black/40" />
+        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-10 md:pb-14 min-h-[360px] md:min-h-[440px] flex flex-col">
+          <Link
+            href="/restaurants"
+            className="inline-flex items-center gap-2 text-white/75 hover:text-white transition-colors text-sm font-semibold w-fit"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Все рестораны
+          </Link>
 
-      {/* Шапка ресторана */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-food-surface-2 to-food-border mb-8">
-        <div className="p-6 md:p-10 flex flex-col md:flex-row gap-6 items-start md:items-center">
-          {/* Иконка/фото */}
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-food-surface flex items-center justify-center text-5xl md:text-6xl flex-shrink-0 shadow-lg">
-            🍽️
-          </div>
-
-          {/* Инфо */}
-          <div className="flex-1">
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-3">
-              {restaurant.name}
-            </h1>
-            <p className="text-food-muted mb-5 max-w-2xl">
-              {restaurant.description}
-            </p>
-
-            <div className="flex flex-wrap gap-3 md:gap-4 text-sm">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-food-surface rounded-full">
-                <Star className="w-4 h-4 fill-food-primary text-food-primary" />
-                <span className="font-bold">{restaurant.rating}</span>
-                <span className="text-food-muted">
-                  ({restaurant.reviewsCount})
+          <div className="mt-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="eyebrow mb-4">Меню ресторана</div>
+              <h1 className="text-5xl md:text-7xl leading-none text-white mb-4">{restaurant.name}</h1>
+              <p className="text-white/75 text-lg max-w-xl mb-6">{restaurant.description}</p>
+              <div className="flex flex-wrap gap-2 text-sm">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-black/50 backdrop-blur text-white">
+                  <Star className="w-4 h-4 fill-food-accent text-food-accent" />
+                  <b>{restaurant.rating}</b>
+                  <span className="text-white/60">({restaurant.reviewsCount})</span>
                 </span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-food-surface rounded-full">
-                <Clock className="w-4 h-4 text-food-primary" />
-                <span>{restaurant.deliveryTime} мин</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-food-surface rounded-full">
-                <Bike className="w-4 h-4 text-food-primary" />
-                <span>
-                  {restaurant.deliveryFee === 0
-                    ? 'Бесплатно'
-                    : `${restaurant.deliveryFee} ₽`}
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-black/50 backdrop-blur text-white">
+                  <Clock className="w-4 h-4 text-food-primary" />
+                  {restaurant.deliveryTime} мин
                 </span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-food-surface rounded-full">
-                <MapPin className="w-4 h-4 text-food-primary" />
-                <span>Мин. {restaurant.minOrder} ₽</span>
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-black/50 backdrop-blur text-white">
+                  <Bike className="w-4 h-4 text-food-primary" />
+                  {restaurant.deliveryFee === 0 ? 'Бесплатная доставка' : `Доставка ${restaurant.deliveryFee} ₽`}
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-black/50 backdrop-blur text-white">
+                  <MapPin className="w-4 h-4 text-food-primary" />
+                  Мин. заказ {restaurant.minOrder} ₽
+                </span>
               </div>
             </div>
-          </div>
 
-          {/* Лайк */}
-          <button
-            onClick={() => setLiked(!liked)}
-            className="absolute top-4 right-4 md:static w-12 h-12 rounded-full bg-food-surface flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-            aria-label="В избранное"
-          >
-            <Heart
-              className={`w-6 h-6 transition-colors ${
-                liked ? 'fill-food-accent text-food-accent' : 'text-food-text'
-              }`}
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Категории меню */}
-      {categories.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar sticky top-[72px] bg-food-bg/90 backdrop-blur z-30 pt-3">
-          {categories.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2.5 rounded-full font-semibold text-sm whitespace-nowrap transition-all ${
-                activeCategory === cat
-                  ? 'bg-food-primary text-white shadow-lg shadow-food-primary/30'
-                  : 'bg-food-surface border border-food-border text-food-text hover:border-food-primary'
-              }`}
+              onClick={() => setLiked(!liked)}
+              className="self-start md:self-end flex items-center gap-2 h-11 px-4 rounded-md border border-white/25 text-white hover:border-white/60 transition-colors text-sm font-semibold"
+              aria-label="В избранное"
+              aria-pressed={liked}
             >
-              {cat}
+              <Heart className={`w-5 h-5 transition-colors ${liked ? 'fill-food-primary text-food-primary' : ''}`} />
+              {liked ? 'В избранном' : 'В избранное'}
             </button>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pb-16">
+        {/* Категории меню */}
+        {categories.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto py-4 mb-6 no-scrollbar sticky top-16 md:top-[72px] bg-food-bg/90 backdrop-blur z-30 -mx-4 px-4 md:mx-0 md:px-0 border-b border-food-border">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 h-10 rounded-md font-display uppercase tracking-[0.12em] text-[13px] whitespace-nowrap transition-all ${
+                  activeCategory === cat
+                    ? 'bg-food-primary text-white'
+                    : 'border border-food-border text-food-text/85 hover:border-food-primary'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Меню */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+          {filteredMenu.map((item) => (
+            <MenuItemCard key={item.id} item={item} restaurantName={restaurant.name} />
           ))}
         </div>
-      )}
 
-      {/* Меню */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredMenu.map((item) => (
-          <MenuItemCard
-            key={item.id}
-            item={item}
-            restaurantName={restaurant.name}
-          />
-        ))}
+        {filteredMenu.length === 0 && (
+          <div className="text-center py-20 text-food-muted">В этой категории пока нет блюд</div>
+        )}
       </div>
-
-      {filteredMenu.length === 0 && (
-        <div className="text-center py-20 text-food-muted">
-          В этой категории пока нет блюд
-        </div>
-      )}
     </main>
   );
 }

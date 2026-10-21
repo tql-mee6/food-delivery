@@ -13,10 +13,10 @@ const STATUS_CONFIG: Record<
   OrderStatus,
   { label: string; icon: typeof Check; color: string }
 > = {
-  accepted: { label: 'Принят', icon: Check, color: 'text-blue-600 bg-blue-50' },
-  preparing: { label: 'Готовится', icon: ChefHat, color: 'text-amber-600 bg-amber-50' },
-  delivering: { label: 'В пути', icon: Bike, color: 'text-purple-600 bg-purple-50' },
-  delivered: { label: 'Доставлен', icon: Home, color: 'text-green-600 bg-green-50' },
+  accepted: { label: 'Принят', icon: Check, color: 'text-sky-300 bg-sky-400/15' },
+  preparing: { label: 'Готовится', icon: ChefHat, color: 'text-amber-300 bg-amber-400/15' },
+  delivering: { label: 'В пути', icon: Bike, color: 'text-violet-300 bg-violet-400/15' },
+  delivered: { label: 'Доставлен', icon: Home, color: 'text-emerald-300 bg-emerald-400/15' },
 };
 
 export default function OrdersPage() {
@@ -47,7 +47,7 @@ export default function OrdersPage() {
         <div className="w-24 h-24 mx-auto rounded-full bg-food-surface-2 flex items-center justify-center mb-6">
           <ShoppingBag className="w-12 h-12 text-food-muted" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
+        <h1 className="text-3xl md:text-4xl mb-3">
           Заказов пока нет
         </h1>
         <p className="text-food-muted mb-8 max-w-md mx-auto">
@@ -55,7 +55,7 @@ export default function OrdersPage() {
         </p>
         <Link
           href="/restaurants"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-105"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-md bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-105"
         >
           <Store className="w-5 h-5" />
           Выбрать ресторан
@@ -67,7 +67,7 @@ export default function OrdersPage() {
   return (
     <main className="max-w-4xl mx-auto px-4 md:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
+        <h1 className="text-4xl md:text-5xl mb-2">
           Мои заказы
         </h1>
         <p className="text-food-muted">
@@ -135,7 +135,7 @@ export default function OrdersPage() {
                   </div>
                   <Link
                     href={`/order/${order.id}`}
-                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-food-primary text-white font-semibold text-sm hover:bg-food-primary-hover transition-all whitespace-nowrap"
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-md bg-food-primary text-white font-semibold text-sm hover:bg-food-primary-hover transition-all whitespace-nowrap"
                   >
                     Подробнее
                     <ArrowRight className="w-4 h-4" />

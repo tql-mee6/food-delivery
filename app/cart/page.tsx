@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
@@ -40,7 +41,7 @@ export default function CartPage() {
         <div className="w-24 h-24 mx-auto rounded-full bg-food-surface-2 flex items-center justify-center mb-6">
           <ShoppingBag className="w-12 h-12 text-food-muted" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
+        <h1 className="text-3xl md:text-4xl mb-3">
           Корзина пуста
         </h1>
         <p className="text-food-muted mb-8 max-w-md mx-auto">
@@ -48,7 +49,7 @@ export default function CartPage() {
         </p>
         <Link
           href="/restaurants"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-105"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-md bg-food-primary text-white font-semibold hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-105"
         >
           <Store className="w-5 h-5" />
           Выбрать ресторан
@@ -75,7 +76,7 @@ export default function CartPage() {
       {/* Заголовок */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
+          <h1 className="text-4xl md:text-5xl mb-2">
             Корзина
           </h1>
           <p className="text-food-muted flex items-center gap-2">
@@ -102,8 +103,12 @@ export default function CartPage() {
             className="flex gap-4 p-4 rounded-2xl bg-food-surface border border-food-border"
           >
             {/* Фото */}
-            <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-xl bg-gradient-to-br from-food-surface-2 to-food-border flex items-center justify-center">
-              <span className="text-3xl">🍽️</span>
+            <div className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-food-surface-2">
+              {item.image ? (
+                <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
+              ) : (
+                <span className="absolute inset-0 flex items-center justify-center text-3xl">🍽️</span>
+              )}
             </div>
 
             {/* Инфо */}
@@ -177,7 +182,7 @@ export default function CartPage() {
 
         <button
           onClick={() => router.push('/checkout')}
-          className="w-full flex items-center justify-center gap-2 py-4 rounded-full bg-food-primary text-white font-bold text-lg hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-[1.02]"
+          className="w-full flex items-center justify-center gap-2 py-4 rounded-md bg-food-primary text-white font-bold text-lg hover:bg-food-primary-hover transition-all shadow-lg shadow-food-primary/30 hover:scale-[1.02]"
         >
           Оформить заказ
           <ArrowRight className="w-5 h-5" />
