@@ -13,6 +13,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 700,
     deliveryFee: 99,
     isOpen: true,
+    address: 'Малая Бронная ул., 32, Москва',
+    lat: 55.7637,
+    lng: 37.5923,
   },
   {
     id: 'sushi-zen',
@@ -26,6 +29,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 1000,
     deliveryFee: 149,
     isOpen: true,
+    address: 'Новый Арбат, 15, Москва',
+    lat: 55.7522,
+    lng: 37.5841,
   },
   {
     id: 'burger-house',
@@ -39,6 +45,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 500,
     deliveryFee: 79,
     isOpen: true,
+    address: 'Тверская ул., 25А, Москва',
+    lat: 55.7701,
+    lng: 37.6064,
   },
   {
     id: 'wok-street',
@@ -52,6 +61,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 800,
     deliveryFee: 129,
     isOpen: true,
+    address: 'Маросейка ул., 9/2, Москва',
+    lat: 55.7569,
+    lng: 37.6361,
   },
   {
     id: 'tbilisi',
@@ -65,6 +77,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 900,
     deliveryFee: 149,
     isOpen: true,
+    address: 'Большая Грузинская ул., 1, Москва',
+    lat: 55.7647,
+    lng: 37.5786,
   },
   {
     id: 'coffee-lab',
@@ -78,6 +93,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 400,
     deliveryFee: 0,
     isOpen: true,
+    address: 'Трёхпрудный пер., 11/13, Москва',
+    lat: 55.7654,
+    lng: 37.5912,
   },
   {
     id: 'pasta-bar',
@@ -91,6 +109,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 600,
     deliveryFee: 99,
     isOpen: true,
+    address: 'Остоженка ул., 20, Москва',
+    lat: 55.7395,
+    lng: 37.5985,
   },
   {
     id: 'roll-club',
@@ -104,6 +125,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 900,
     deliveryFee: 149,
     isOpen: true,
+    address: 'Пятницкая ул., 29, Москва',
+    lat: 55.7384,
+    lng: 37.6285,
   },
   {
     id: 'steak-house',
@@ -117,6 +141,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 1500,
     deliveryFee: 199,
     isOpen: true,
+    address: 'Кутузовский проспект, 36, Москва',
+    lat: 55.7391,
+    lng: 37.5219,
   },
   {
     id: 'noodle-house',
@@ -130,6 +157,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 600,
     deliveryFee: 99,
     isOpen: true,
+    address: 'Сретенка ул., 22, Москва',
+    lat: 55.7698,
+    lng: 37.6326,
   },
   {
     id: 'khinkalnaya',
@@ -143,6 +173,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 700,
     deliveryFee: 129,
     isOpen: true,
+    address: 'Поварская ул., 8, Москва',
+    lat: 55.7524,
+    lng: 37.593,
   },
   {
     id: 'bakery',
@@ -156,6 +189,9 @@ export const restaurants: Restaurant[] = [
     minOrder: 500,
     deliveryFee: 0,
     isOpen: true,
+    address: 'Малая Дмитровка ул., 12, Москва',
+    lat: 55.7701,
+    lng: 37.6073,
   },
 ];
 

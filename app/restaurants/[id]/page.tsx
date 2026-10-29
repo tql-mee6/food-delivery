@@ -5,10 +5,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
-  ArrowLeft, Star, Clock, Bike, MapPin, Heart
+  ArrowLeft, Star, Clock, Bike, MapPin, Heart, Navigation, ExternalLink
 } from 'lucide-react';
 import { restaurants } from '@/lib/restaurants';
 import { getMenuByRestaurant, getCategoriesForRestaurant } from '@/lib/menu';
+import { yandexRouteUrl, googleRouteUrl, dvGisUrl, osmEmbedUrl } from '@/lib/maps';
 import MenuItemCard from '../../components/MenuItemCard';
 
 export default function RestaurantPage({
@@ -90,6 +91,72 @@ export default function RestaurantPage({
               <Heart className={`w-5 h-5 transition-colors ${liked ? 'fill-food-primary text-food-primary' : ''}`} />
               {liked ? 'В избранном' : 'В избранное'}
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Адрес и маршрут */}
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-10">
+        <div className="grid md:grid-cols-[1fr_1.3fr] gap-4 md:gap-5">
+          <div className="rounded-xl bg-food-surface ring-1 ring-white/5 p-6 md:p-7 flex flex-col">
+            <div className="eyebrow mb-4">Где нас найти</div>
+            <div className="flex items-start gap-3 mb-6">
+              <span className="w-10 h-10 rounded-full bg-food-primary/15 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-5 h-5 text-food-primary" />
+              </span>
+              <div>
+                <div className="font-display text-xl leading-snug">{restaurant.address}</div>
+                <div className="text-food-muted text-sm mt-1">
+                  Доставка {restaurant.deliveryTime} мин · сами заберёте быстрее
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+              <a
+                href={yandexRouteUrl(restaurant.lat, restaurant.lng)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 inline-flex items-center justify-center gap-2 h-12 px-5 rounded-md bg-food-primary text-white font-semibold text-sm hover:bg-food-primary-hover transition-colors"
+              >
+                <Navigation className="w-4 h-4" />
+                Проложить маршрут
+              </a>
+              <div className="flex gap-3">
+                <a
+                  href={googleRouteUrl(restaurant.lat, restaurant.lng)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-12 px-4 rounded-md border border-food-border hover:border-food-primary transition-colors text-sm font-semibold"
+                  aria-label="Открыть адрес в Google Maps"
+                >
+                  Google Maps
+                  <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                </a>
+                <a
+                  href={dvGisUrl(restaurant.lat, restaurant.lng)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-12 px-4 rounded-md border border-food-border hover:border-food-primary transition-colors text-sm font-semibold"
+                  aria-label="Открыть адрес в 2ГИС"
+                >
+                  2ГИС
+                  <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative rounded-xl overflow-hidden ring-1 ring-white/5 min-h-[260px] bg-food-surface-2">
+            <iframe
+              src={osmEmbedUrl(restaurant.lat, restaurant.lng)}
+              title={`Карта: ${restaurant.address}`}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full grayscale-[0.25] contrast-[1.05]"
+              style={{ border: 0 }}
+            />
+            {/* Лёгкое затемнение, чтобы карта не спорила с остальным интерфейсом */}
+            <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-black/20" />
           </div>
         </div>
       </section>

@@ -33,7 +33,10 @@ function RestaurantsContent() {
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       result = result.filter(
-        (r) => r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q)
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          r.description.toLowerCase().includes(q) ||
+          r.address.toLowerCase().includes(q)
       );
     }
     if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);

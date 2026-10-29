@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Star, Clock, Bike, ArrowUpRight } from 'lucide-react';
+import { Star, Clock, Bike, ArrowUpRight, MapPin } from 'lucide-react';
 import type { Restaurant } from '@/types';
 
 export default function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
@@ -56,7 +56,10 @@ export default function RestaurantCard({ restaurant }: { restaurant: Restaurant 
             {restaurant.name}
           </h3>
           <p className="text-white/70 text-sm mb-1 line-clamp-2">{restaurant.description}</p>
-          <p className="text-white/45 text-xs mb-4">Мин. заказ {restaurant.minOrder} ₽</p>
+          <p className="flex items-center gap-1.5 text-white/45 text-xs mb-4 line-clamp-1">
+            <MapPin className="w-3.5 h-3.5 text-food-primary/70 flex-shrink-0" />
+            {restaurant.address}
+          </p>
 
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4 text-[13px] text-white/85 whitespace-nowrap">
@@ -68,6 +71,7 @@ export default function RestaurantCard({ restaurant }: { restaurant: Restaurant 
                 <Bike className="w-4 h-4 text-food-primary" />
                 {restaurant.deliveryFee === 0 ? 'Бесплатно' : `${restaurant.deliveryFee} ₽`}
               </span>
+              <span className="hidden sm:inline text-white/55">от {restaurant.minOrder} ₽</span>
             </div>
             <span className="w-10 h-10 rounded-full bg-food-primary flex items-center justify-center translate-y-1 opacity-90 group-hover:translate-y-0 group-hover:opacity-100 group-hover:rotate-45 transition-all">
               <ArrowUpRight className="w-5 h-5 text-white" />

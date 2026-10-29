@@ -12,6 +12,10 @@ export type Restaurant = {
   minOrder: number;
   deliveryFee: number;
   isOpen: boolean;
+  /** Реальный адрес в Москве — для карты и построения маршрута */
+  address: string;
+  lat: number;
+  lng: number;
 };
 
 export type MenuCategory = 'Популярное' | 'Салаты' | 'Супы' | 'Горячее' | 'Пицца' | 'Суши' | 'Десерты' | 'Напитки';
